@@ -1,0 +1,42 @@
+{
+  "$schema": "./ahkgen.schema.json",
+  "settings": {
+    "tick_ms": 10,
+    "sounds": { "on": [1000, 100], "off": [500, 100] }
+  },
+  "macros": [
+    {
+      "name": "Auto balls",
+      "hotkey": "F1",
+      "channel": "balls",
+      "steps": [
+        { "tap": "2" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "tap": "2" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "tap": "2" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "tap": "2" }, { "wait": 500, "jitter": 200 },
+        { "wait": 10000, "jitter": 100 }
+      ]
+    },
+    {
+      "name": "Auto rain",
+      "hotkey": "F2",
+      "channel": "rain",
+      "steps": [
+        { "tap": "1" }, { "wait": 100, "jitter": 50 },
+        { "wait": 10, "jitter": 50 }
+      ]
+    },
+    {
+      "name": "Auto thunder",
+      "hotkey": "F3",
+      "channel": "thunder",
+      "steps": [
+        { "tap": "3" }, { "wait": 100, "jitter": 50 },
+        { "wait": 10, "jitter": 50 }
+      ]
+    }
+  ]
+}

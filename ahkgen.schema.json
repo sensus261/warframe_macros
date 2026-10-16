@@ -1,0 +1,355 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ahkgen.schema.json",
+  "title": "ahkgen macro config",
+  "description": "Config for ahkgen.ps1 / ahkgen.py. Generates a channel-based, Sleep-free AutoHotkey v1 script.",
+  "type": "object",
+  "required": [
+    "macros"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "settings": {
+      "$ref": "#/definitions/settings"
+    },
+    "macros": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The macros. Each gets a toggle hotkey.",
+      "items": {
+        "$ref": "#/definitions/macro"
+      }
+    }
+  },
+  "definitions": {
+    "ms": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Time in milliseconds."
+    },
+    "jitter": {
+      "type": "number",
+      "minimum": 0,
+      "description": "A random 0..jitter ms is added to this time, freshly picked every cycle. 0 = fixed timing."
+    },
+    "key": {
+      "type": "string",
+      "minLength": 1,
+      "description": "An AHK key name, e.g. \"1\", \"q\", \"Space\", \"LButton\", \"F5\", \"Numpad0\", \"Shift\"."
+    },
+    "beep": {
+      "type": "array",
+      "description": "[frequency Hz, duration ms]",
+      "items": [
+        {
+          "type": "integer",
+          "minimum": 37,
+          "maximum": 32767,
+          "description": "Frequency in Hz"
+        },
+        {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Duration in ms"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "settings": {
+      "type": "object",
+      "description": "Global options. All optional.",
+      "additionalProperties": false,
+      "properties": {
+        "tick_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10,
+          "description": "How often the main loop checks whether a macro step is due (ms). Lower = more precise timing, slightly more CPU."
+        },
+        "sounds": {
+          "$ref": "#/definitions/sounds",
+          "default": {
+            "on": [
+              1000,
+              100
+            ],
+            "off": [
+              500,
+              100
+            ]
+          }
+        },
+        "window": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "If set, hotkeys only work while this window is active. AHK WinTitle syntax, e.g. \"ahk_exe Game.exe\"."
+        },
+        "panic_hotkey": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "A hotkey that stops every macro and releases all held keys, e.g. \"F12\"."
+        },
+        "jitter_default": {
+          "$ref": "#/definitions/jitter",
+          "default": 0,
+          "description": "Jitter applied to every 'wait' and 'hold' step that doesn't set its own."
+        }
+      }
+    },
+    "macro": {
+      "type": "object",
+      "required": [
+        "hotkey"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Label shown in the generated script's comments. Defaults to the hotkey."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional note, shown in the generated script's header."
+        },
+        "hotkey": {
+          "type": "string",
+          "minLength": 1,
+          "description": "AHK hotkey that toggles this macro, e.g. \"F1\", \"^F5\" (Ctrl+F5), \"!q\" (Alt+Q), \"+F2\" (Shift+F2). Must be unique.",
+          "examples": [
+            "F1",
+            "^F5",
+            "!q",
+            "+F2",
+            "XButton1"
+          ]
+        },
+        "channel": {
+          "type": "string",
+          "description": "Macros with the same channel name are mutually exclusive: only one can run at a time. Omit to give this macro its own channel."
+        },
+        "loop": {
+          "type": "boolean",
+          "default": true,
+          "description": "true = repeat the steps until toggled off. false = run them once (all tracks), then stop automatically."
+        },
+        "takeover": {
+          "type": "boolean",
+          "default": false,
+          "description": "If another macro occupies this channel: false = just stop it (press again to start). true = stop it AND start this macro in the same press."
+        },
+        "sounds": {
+          "$ref": "#/definitions/sounds",
+          "description": "Override the global beeps for this macro only (its own on/off/finish). false = this macro is silent."
+        },
+        "steps": {
+          "$ref": "#/definitions/stepList"
+        },
+        "tracks": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Use instead of 'steps' to run several step lists IN PARALLEL under one hotkey (e.g. spam a key while a movement sequence runs). They start and stop together.",
+          "items": {
+            "type": "object",
+            "required": [
+              "steps"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Label shown in the generated script's comments."
+              },
+              "steps": {
+                "$ref": "#/definitions/stepList"
+              }
+            }
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "steps"
+          ],
+          "not": {
+            "required": [
+              "tracks"
+            ]
+          }
+        },
+        {
+          "required": [
+            "tracks"
+          ],
+          "not": {
+            "required": [
+              "steps"
+            ]
+          }
+        }
+      ]
+    },
+    "step": {
+      "oneOf": [
+        {
+          "title": "tap",
+          "type": "object",
+          "required": [
+            "tap"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "tap": {
+              "$ref": "#/definitions/key",
+              "description": "Press and release this key."
+            },
+            "times": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "description": "Tap this many times in a row."
+            },
+            "gap": {
+              "$ref": "#/definitions/ms",
+              "default": 50,
+              "description": "Pause between repeated taps (only used when times > 1)."
+            },
+            "should_press_again_on_stop": {
+              "type": "boolean",
+              "default": false,
+              "description": "For toggle abilities: if this tap was the LAST key the macro pressed when it gets stopped (hotkey, another macro on the channel, or panic key), press this key once more to turn the ability back off. Not triggered when a loop:false macro finishes on its own."
+            }
+          }
+        },
+        {
+          "title": "hold",
+          "type": "object",
+          "required": [
+            "hold",
+            "ms"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "hold": {
+              "$ref": "#/definitions/key",
+              "description": "Hold this key down, then release it."
+            },
+            "ms": {
+              "$ref": "#/definitions/ms",
+              "description": "How long to hold it."
+            },
+            "jitter": {
+              "$ref": "#/definitions/jitter"
+            }
+          }
+        },
+        {
+          "title": "wait",
+          "type": "object",
+          "required": [
+            "wait"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "wait": {
+              "$ref": "#/definitions/ms",
+              "description": "Pause before the next step."
+            },
+            "jitter": {
+              "$ref": "#/definitions/jitter"
+            }
+          }
+        },
+        {
+          "title": "down",
+          "type": "object",
+          "required": [
+            "down"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "down": {
+              "$ref": "#/definitions/key",
+              "description": "Press this key down and leave it held (auto-released when the macro stops)."
+            }
+          }
+        },
+        {
+          "title": "up",
+          "type": "object",
+          "required": [
+            "up"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "up": {
+              "$ref": "#/definitions/key",
+              "description": "Release a key held with 'down'."
+            }
+          }
+        },
+        {
+          "title": "send",
+          "type": "object",
+          "required": [
+            "send"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "send": {
+              "type": "string",
+              "description": "Raw AHK Send string, for anything else, e.g. \"{Shift down}e{Shift up}\" or \"^c\". Keys pressed 'down' here are NOT auto-released on stop.",
+              "examples": [
+                "{Shift down}e{Shift up}",
+                "^c",
+                "{Enter}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "sounds": {
+      "description": "Beeps when a macro turns on/off. false = silent.",
+      "oneOf": [
+        {
+          "const": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "on",
+            "off"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "on": {
+              "$ref": "#/definitions/beep"
+            },
+            "off": {
+              "$ref": "#/definitions/beep"
+            }
+          }
+        }
+      ]
+    },
+    "stepList": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Runs top to bottom (then repeats if loop is true).",
+      "items": {
+        "$ref": "#/definitions/step"
+      }
+    }
+  }
+}

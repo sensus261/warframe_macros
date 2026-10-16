@@ -1,0 +1,45 @@
+{
+  "$schema": "./ahkgen.schema.json",
+  "settings": {
+    "tick_ms": 10,
+    "sounds": { "on": [1000, 100], "off": [500, 100] }
+  },
+  "macros": [
+    {
+      "name": "Auto Whipclaw",
+      "description": "Spam 1 every 200ms.",
+      "hotkey": "F1",
+      "channel": "khora",
+      "steps": [
+        { "tap": "1" },
+        { "wait": 300 }
+      ]
+    },
+    {
+      "name": "Auto Survival",
+      "description": "Whipclaw spam + walk forward, Dome, walk back, Dispensary, 13s pause.",
+      "hotkey": "F2",
+      "channel": "khora",
+      "tracks": [
+        {
+          "name": "Whipclaw spam",
+          "steps": [
+            { "tap": "1" },
+            { "wait": 400 }
+          ]
+        },
+        {
+          "name": "Move + abilities",
+          "steps": [
+            { "hold": "w", "ms": 1500 },
+            { "tap": "4", "times": 10, "gap": 50 },
+            { "wait": 850 },
+            { "hold": "s", "ms": 1500 },
+            { "tap": "3", "times": 10, "gap": 50 },
+            { "wait": 9050 }
+          ]
+        }
+      ]
+    }
+  ]
+}

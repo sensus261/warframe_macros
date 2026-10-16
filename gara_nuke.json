@@ -1,0 +1,48 @@
+{
+  "$schema": "./ahkgen.schema.json",
+  "settings": {
+    "tick_ms": 10,
+    "sounds": { "on": [1000, 100], "off": [500, 100] }
+  },
+  "macros": [
+    {
+      "name": "Infinuke",
+      "hotkey": "F1",
+      "channel": "main",
+      "steps": [
+        { "tap": "3" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 2000, "jitter": 300 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "hold": "1", "ms": 500, "jitter": 150 },
+        { "wait": 400, "jitter": 300 },
+        
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 2000, "jitter": 300 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "hold": "1", "ms": 500, "jitter": 150 },
+        { "wait": 400, "jitter": 300 },
+
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 2000, "jitter": 300 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "hold": "1", "ms": 500, "jitter": 150 },
+        { "wait": 400, "jitter": 300 },
+
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 2000, "jitter": 300 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "hold": "1", "ms": 500, "jitter": 150 },
+        { "wait": 400, "jitter": 300 },
+
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 2000, "jitter": 300 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "hold": "1", "ms": 500, "jitter": 150 },
+        { "wait": 400, "jitter": 300 },
+
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 2000, "jitter": 300 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "hold": "1", "ms": 500, "jitter": 150 },
+        { "wait": 400, "jitter": 300 }
+      ]
+    }
+  ]
+}

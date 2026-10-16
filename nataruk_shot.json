@@ -1,0 +1,33 @@
+{
+  "$schema": "./ahkgen.schema.json",
+  "settings": {
+    "tick_ms": 10,
+    "sounds": { "on": [1000, 100], "off": [500, 100] }
+  },
+  "macros": [
+    {
+      "name": "Single shot",
+      "description": "Charge LButton 300ms, release, 400ms recovery. Stops auto shot if running.",
+      "hotkey": "F1",
+      "channel": "shot",
+      "loop": false,
+      "takeover": true,
+      "sounds": false,
+      "steps": [
+        { "hold": "LButton", "ms": 270 },
+        { "wait": 400 }
+      ]
+    },
+    {
+      "name": "Auto shot",
+      "description": "Repeat: charge LButton 300ms, release, wait 400ms + 100ms.",
+      "hotkey": "F2",
+      "channel": "shot",
+      "takeover": true,
+      "steps": [
+        { "hold": "LButton", "ms": 270 },
+        { "wait": 800 }
+      ]
+    }
+  ]
+}

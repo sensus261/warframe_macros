@@ -1,0 +1,66 @@
+{
+  "$schema": "./ahkgen.schema.json",
+  "settings": {
+    "tick_ms": 10,
+    "sounds": { "on": [1000, 100], "off": [500, 100] }
+  },
+  "macros": [
+    {
+      "name": "Infinuke",
+      "hotkey": "F1",
+      "channel": "main",
+      "steps": [
+        { "tap": "3" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 500, "jitter": 200 },
+        { "wait": 12000, "jitter": 1000 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 }
+      ]
+    },
+    {
+      "name": "Patient nuke",
+      "hotkey": "F2",
+      "channel": "main",
+      "loop": false,
+      "steps": [
+        { "tap": "3" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 500, "jitter": 200 },
+        { "wait": 12000, "jitter": 1000 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 }
+      ]
+    },
+    {
+      "name": "Patient nuke repeat",
+      "hotkey": "F3",
+      "channel": "main",
+      "loop": true,
+      "steps": [
+        { "tap": "3" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 500, "jitter": 200 },
+        { "wait": 12000, "jitter": 1000 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "wait": 12000, "jitter": 1000 }
+      ]
+    },
+    {
+      "name": "Patient nuke while walking",
+      "hotkey": "F4",
+      "channel": "main",
+      "loop": true,
+      "steps": [
+        { "tap": "3" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 500, "jitter": 200 },
+        { "wait": 12000, "jitter": 1000 },
+        { "tap": "4" }, { "wait": 500, "jitter": 200 },
+        { "wait": 400, "jitter": 100 },
+        { "wait": 12000, "jitter": 1000 }
+      ]
+    }
+  ]
+}
