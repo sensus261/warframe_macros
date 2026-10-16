@@ -49,17 +49,32 @@
     },
     {
       "name": "Patient nuke while walking",
+      "description": "F3's patient nuke loop + walk forward/back the whole time.",
       "hotkey": "F4",
       "channel": "main",
       "loop": true,
-      "steps": [
-        { "tap": "3" }, { "wait": 500, "jitter": 200 },
-        { "wait": 400, "jitter": 100 },
-        { "tap": "4", "should_press_again_on_stop": true }, { "wait": 500, "jitter": 200 },
-        { "wait": 12000, "jitter": 1000 },
-        { "tap": "4" }, { "wait": 500, "jitter": 200 },
-        { "wait": 400, "jitter": 100 },
-        { "wait": 12000, "jitter": 1000 }
+      "tracks": [
+        {
+          "name": "Patient nuke",
+          "steps": [
+            { "tap": "3" }, { "wait": 500, "jitter": 200 },
+            { "wait": 400, "jitter": 100 },
+            { "tap": "4", "should_press_again_on_stop": true }, { "wait": 500, "jitter": 200 },
+            { "wait": 12000, "jitter": 1000 },
+            { "tap": "4" }, { "wait": 500, "jitter": 200 },
+            { "wait": 400, "jitter": 100 },
+            { "wait": 12000, "jitter": 1000 }
+          ]
+        },
+        {
+          "name": "Walk forward/back",
+          "steps": [
+            { "hold": "w", "ms": 1500, "jitter": 300 },
+            { "wait": 200, "jitter": 100 },
+            { "hold": "s", "ms": 1500, "jitter": 300 },
+            { "wait": 200, "jitter": 100 }
+          ]
+        }
       ]
     }
   ]
