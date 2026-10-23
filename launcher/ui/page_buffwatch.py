@@ -6,7 +6,7 @@ import customtkinter as ctk
 
 from core import buffwatch as bw, paths, procs, shell
 from . import theme as t
-from .widgets import Button, Card, Dot, Page, PageHeader, section_label
+from .widgets import Button, Card, Dot, Page, PageHeader, section_label, update
 
 MODE_TEXT = {
     bw.SOURCE: "From the source folder (buff_watch\\run.bat's way)",
@@ -79,33 +79,33 @@ class BuffWatchPage(Page):
         live = self._live
         if self.busy:
             self.dot.set("amber")
-            self.state_label.configure(text=self.busy)
+            update(self.state_label, text=self.busy)
         elif live:
             self.dot.set("green")
-            self.state_label.configure(text="Running")
+            update(self.state_label, text="Running")
         else:
             self.dot.set("grey")
-            self.state_label.configure(text="Not running")
+            update(self.state_label, text="Not running")
         if live:
-            self.state_sub.configure(text="Up for %s   ·   PID %d" % (
+            update(self.state_sub, text="Up for %s   \u00b7   PID %d" % (
                 procs.format_uptime(live[0].uptime()), live[0].pid))
         else:
-            self.state_sub.configure(text="Its overlays appear over the game once it starts.")
+            update(self.state_sub, text="Its overlays appear over the game once it starts.")
         if live:
             self.main_btn.set("Stop", "stop", "danger")
         else:
             self.main_btn.set("Start", "play", "primary")
-        self.main_btn.configure(state="disabled" if self.busy else "normal")
-        self.restart_btn.configure(state="normal" if live and not self.busy else "disabled")
-        self.mode_value.configure(text=MODE_TEXT[mode])
-        self.data_value.configure(text=_rel(bw.data_dir(mode)))
+        update(self.main_btn, state="disabled" if self.busy else "normal")
+        update(self.restart_btn, state="normal" if live and not self.busy else "disabled")
+        update(self.mode_value, text=MODE_TEXT[mode])
+        update(self.data_value, text=_rel(bw.data_dir(mode)))
         notes = []
         if bw.needs_setup(mode):
             notes.append("The first start installs BuffWatch's Python packages in a console "
                          "window. That takes a minute or two, once.")
         if len(live) > 1:
             notes.append("%d copies of BuffWatch are running." % len(live))
-        self.note.configure(text="\n".join(notes))
+        update(self.note, text="\n".join(notes))
 
     def on_show(self):
         self.refresh()

@@ -7,7 +7,7 @@ import customtkinter as ctk
 
 from core import ahk, macros, paths, procs, shell
 from . import theme as t
-from .widgets import Button, Card, Chip, EmptyState, Page, PageHeader, Pill, scroll_body
+from .widgets import Button, Card, Chip, EmptyState, Page, PageHeader, Pill, scroll_body, update
 
 CHIPS_PER_LINE = 4
 
@@ -108,7 +108,7 @@ class ConfigCard(Card):
             bits.append("running for " + procs.format_uptime(live[0].uptime()))
         elif status in (macros.READY, macros.STALE):
             bits.append("generated " + _ago(os.path.getmtime(c.script)))
-        self.meta.configure(text="   ·   ".join(bits))
+        update(self.meta, text="   ·   ".join(bits))
 
     # ------------------------------------------------------------ actions
     def on_edit(self):

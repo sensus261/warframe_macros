@@ -14,7 +14,7 @@ from .page_buffwatch import BuffWatchPage
 from .page_macros import MacrosPage
 from .page_running import RunningPage
 from .page_settings import SettingsPage
-from .widgets import Dot
+from .widgets import Dot, update
 
 POLL_S = 1.5  # how often running processes are checked
 
@@ -289,7 +289,7 @@ class App(ctk.CTk):
         if self.current:
             self.pages[self.current].on_tick()
         exe = self.ahk_exe()
-        self._foot_ahk.configure(text=("AutoHotkey v1 found" if exe else
+        update(self._foot_ahk, text=("AutoHotkey v1 found" if exe else
                                        "AutoHotkey v1 not found") +
                                  "\nScripts keep running after you close this window.")
         self.after(500, self._tick)
