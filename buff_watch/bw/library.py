@@ -129,14 +129,15 @@ class Library:
                 self.version += 1
             self.save()
 
-    def move(self, entry_id, delta):
+    def reorder(self, ids):
+        """Put the given entries in this order. Entries not listed (e.g. hidden ignored
+        rows) keep their positions; the listed ones fill the slots they already occupy."""
         with self.lock:
-            e = self.get(entry_id)
-            if e is None:
-                return
-            i = self.entries.index(e)
-            j = max(0, min(len(self.entries) - 1, i + delta))
-            self.entries.insert(j, self.entries.pop(i))
+            pos = {i: n for n, i in enumerate(ids)}
+            slots = [n for n, e in enumerate(self.entries) if e.id in pos]
+            moving = sorted((self.entries[n] for n in slots), key=lambda e: pos[e.id])
+            for n, e in zip(slots, moving):
+                self.entries[n] = e
             self.save()
 
     def touch(self):

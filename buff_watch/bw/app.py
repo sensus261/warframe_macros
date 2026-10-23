@@ -40,6 +40,7 @@ class App:
         self._thumbs = {}
         self._last_tree = 0
         self._last_preview = 0
+        self._dnd = None
 
         self.root = tk.Tk()
         self.root.title("BuffWatch")
@@ -146,6 +147,9 @@ class App:
         self.tree.grid(row=0, column=0, sticky="nsew")
         sb.grid(row=0, column=1, sticky="ns")
         self.tree.bind("<Double-1>", lambda e: self.toggle_pin())
+        self.tree.bind("<ButtonPress-1>", self._dnd_press, add="+")
+        self.tree.bind("<B1-Motion>", self._dnd_motion, add="+")
+        self.tree.bind("<ButtonRelease-1>", self._dnd_release, add="+")
         f.rowconfigure(0, weight=1)
         f.columnconfigure(0, weight=1)
 
@@ -160,15 +164,14 @@ class App:
         bar2.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(4, 0))
         for text, cmd in (("Warn when missing", self.toggle_alert),
                           ("Coloured icon", self.toggle_mode),
-                          ("Up", lambda: self.move(-1)), ("Down", lambda: self.move(1)),
                           ("Delete", self.delete)):
             ttk.Button(bar2, text=text, command=cmd).pack(side="left", padx=2)
         self.show_ignored = tk.BooleanVar(value=False)
         ttk.Checkbutton(bar2, text="Show ignored", variable=self.show_ignored,
                         command=self.refresh_tree).pack(side="right")
         ttk.Label(f, foreground="#666", text=(
-            "Double-click a row to show/hide it in the overlay. Select several rows with "
-            "Ctrl/Shift. 'Coloured icon' matches in grayscale instead of white-only "
+            "Double-click a row to show/hide it in the overlay. Drag rows to reorder them. "
+            "Select several rows with Ctrl/Shift. 'Coloured icon' matches in grayscale instead of white-only "
             "(use it for icons that are not white).")).grid(
             row=3, column=0, columnspan=2, sticky="w", pady=(4, 0))
         self.refresh_tree()
@@ -293,11 +296,68 @@ class App:
             self.library.update(e.id, threshold=round(v, 2) if v >= 0.3 else None)
         self.refresh_tree()
 
-    def move(self, delta):
-        sel = self._selected()
-        for e in (sel if delta < 0 else reversed(sel)):
-            self.library.move(e.id, delta)
-        self.refresh_tree()
+    # Drag-and-drop reordering: rows move live under the cursor, the order is saved on release.
+    def _dnd_press(self, ev):
+        self._dnd = None
+        if self.tree.identify_region(ev.x, ev.y) not in ("tree", "cell"):
+            return None
+        row = self.tree.identify_row(ev.y)
+        if not row:
+            return None
+        self._dnd = {"y": ev.y, "row": row, "moved": False, "keep_sel": False}
+        # Pressing on an already selected row (no Ctrl/Shift) keeps the selection so the
+        # whole group can be dragged; a plain click without dragging selects just that row.
+        if row in self.tree.selection() and not ev.state & 0x0005:
+            self._dnd["keep_sel"] = True
+            return "break"
+        return None
+
+    def _dnd_motion(self, ev):
+        d = self._dnd
+        if d is None:
+            return
+        if not d["moved"]:
+            if abs(ev.y - d["y"]) < 5:
+                return
+            d["moved"] = True
+            self.tree.configure(cursor="fleur")
+        rows = list(self.tree.get_children())
+        moving = [i for i in rows if i in set(self.tree.selection())] or [d["row"]]
+        rest = [i for i in rows if i not in moving]
+        height = self.tree.winfo_height()
+        if ev.y < 0:
+            self.tree.yview_scroll(-1, "units")
+        elif ev.y > height:
+            self.tree.yview_scroll(1, "units")
+        target = self.tree.identify_row(min(max(ev.y, 0), height - 1))
+        if target in moving:
+            return
+        if target:
+            idx = rest.index(target)
+            bbox = self.tree.bbox(target)
+            if bbox and ev.y > bbox[1] + bbox[3] / 2:
+                idx += 1
+        else:
+            # Over the heading or the empty space below the last row.
+            top = ev.y < height / 2
+            if top and self.tree.yview()[0] > 0:
+                return
+            idx = 0 if top else len(rest)
+        new = rest[:idx] + moving + rest[idx:]
+        if new != rows:
+            for n, iid in enumerate(new):
+                self.tree.move(iid, "", n)
+
+    def _dnd_release(self, ev):
+        d, self._dnd = self._dnd, None
+        if d is None:
+            return
+        if d["moved"]:
+            self.tree.configure(cursor="")
+            self.library.reorder(self.tree.get_children())
+        elif d["keep_sel"]:
+            self.tree.selection_set(d["row"])
+            self.tree.focus(d["row"])
 
     def delete(self):
         sel = self._selected()
