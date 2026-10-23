@@ -1,5 +1,5 @@
 {
-  "$schema": "./ahkgen.schema.json",
+  "$schema": "../ahkgen.schema.json",
   "settings": {
     "tick_ms": 10,
     "sounds": { "on": [1000, 100], "off": [500, 100] }
