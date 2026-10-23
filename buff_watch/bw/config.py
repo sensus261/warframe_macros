@@ -45,6 +45,10 @@ DEFAULTS = {
         "toggle_hotkey": "f8",
         "only_when_focused": True,  # never send keys unless the game window has focus
     },
+    # Buffs list groups (list only, the overlay ignores them): names in display order, and
+    # the collapsed ones ("" = the Ungrouped section). A buff's group is stored on its entry.
+    "groups": [],
+    "groups_collapsed": [],
     # Overlay window.
     "overlay": {
         "visible": True,

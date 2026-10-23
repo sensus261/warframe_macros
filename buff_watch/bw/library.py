@@ -16,7 +16,7 @@ KIND_IGNORE = "ignore"
 class Entry:
     def __init__(self, id, name, kind=KIND_BUFF, pinned=False, threshold=None,
                  mode="white", alert_missing=False, catalog=None, learned=True,
-                 key=None, key_interval=1500, key_max=5):
+                 key=None, key_interval=1500, key_max=5, group=None):
         self.id = id
         self.name = name
         self.kind = kind
@@ -29,6 +29,7 @@ class Entry:
         self.key = key  # auto-press this key while the buff is off (None = feature off)
         self.key_interval = key_interval  # ms between presses
         self.key_max = key_max  # presses before giving up until the buff is seen again
+        self.group = group  # Buffs list group name (None = ungrouped)
         self.image = None  # BGR numpy array
 
     @property
@@ -41,7 +42,7 @@ class Entry:
             "threshold": self.threshold, "mode": self.mode,
             "alert_missing": self.alert_missing, "catalog": self.catalog,
             "learned": self.learned, "key": self.key, "key_interval": self.key_interval,
-            "key_max": self.key_max,
+            "key_max": self.key_max, "group": self.group,
         }
 
 
@@ -138,6 +139,14 @@ class Library:
             moving = sorted((self.entries[n] for n in slots), key=lambda e: pos[e.id])
             for n, e in zip(slots, moving):
                 self.entries[n] = e
+            self.save()
+
+    def rename_group(self, old, new):
+        """Move every entry of group `old` to `new` (None = ungrouped)."""
+        with self.lock:
+            for e in self.entries:
+                if e.group == old:
+                    e.group = new
             self.save()
 
     def touch(self):

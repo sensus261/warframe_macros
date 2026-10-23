@@ -18,6 +18,20 @@ from .ui_overlay import Overlay
 from .ui_overlay_settings import OverlaySettingsTab
 from .worker import Worker
 
+GROUP_IID = "group:"  # prefix of the Buffs list's group header rows (entry ids are plain hex)
+
+
+def _group_iid(name):
+    return GROUP_IID + (name or "")
+
+
+def _is_group(iid):
+    return iid.startswith(GROUP_IID)
+
+
+def _group_name(iid):
+    return iid[len(GROUP_IID):] or None
+
 PREVIEW_W = 760
 
 
@@ -143,11 +157,15 @@ class App:
                              anchor="w" if c in ("name", "opts", "auto") else "center")
         self.tree.tag_configure("on", foreground="#0a7a20")
         self.tree.tag_configure("ignored", foreground="#999")
+        self.tree.tag_configure("group", font=("Segoe UI", 10, "bold"), background="#e8ecf2")
         sb = ttk.Scrollbar(f, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=sb.set)
         self.tree.grid(row=0, column=0, sticky="nsew")
         sb.grid(row=0, column=1, sticky="ns")
-        self.tree.bind("<Double-1>", lambda e: self.toggle_pin())
+        self.tree.bind("<Double-1>", self._on_double_click)
+        for ev in ("<<TreeviewOpen>>", "<<TreeviewClose>>"):
+            # Fired before the row actually opens/closes, so read the state afterwards.
+            self.tree.bind(ev, lambda e: self.root.after_idle(self._save_group_state))
         self.tree.bind("<ButtonPress-1>", self._dnd_press, add="+")
         self.tree.bind("<B1-Motion>", self._dnd_motion, add="+")
         self.tree.bind("<ButtonRelease-1>", self._dnd_release, add="+")
@@ -165,14 +183,18 @@ class App:
         bar2.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(4, 0))
         for text, cmd in (("Warn when missing", self.toggle_alert),
                           ("Coloured icon", self.toggle_mode),
+                          ("New group...", self.new_group),
+                          ("Move to group...", self.move_to_group),
                           ("Delete", self.delete)):
             ttk.Button(bar2, text=text, command=cmd).pack(side="left", padx=2)
         self.show_ignored = tk.BooleanVar(value=False)
         ttk.Checkbutton(bar2, text="Show ignored", variable=self.show_ignored,
                         command=self.refresh_tree).pack(side="right")
         ttk.Label(f, foreground="#666", text=(
-            "Double-click a row to show/hide it in the overlay. Drag rows to reorder them. "
-            "Select several rows with Ctrl/Shift. 'Coloured icon' matches in grayscale instead of white-only "
+            "Double-click a row to show/hide it in the overlay. Drag rows to reorder them or "
+            "to move them into another group; drag a group's header to reorder groups. Select "
+            "several rows with Ctrl/Shift. Select a group's header to rename or delete it. "
+            "'Coloured icon' matches in grayscale instead of white-only "
             "(use it for icons that are not white).")).grid(
             row=3, column=0, columnspan=2, sticky="w", pady=(4, 0))
         self.refresh_tree()
@@ -180,15 +202,36 @@ class App:
     def _selected(self):
         return [self.library.get(i) for i in self.tree.selection() if self.library.get(i)]
 
+    def _entry_group(self, e):
+        return e.group if e.group in self.settings["groups"] else None
+
+    def _tree_entries(self):
+        """Entry rows in display order, across groups."""
+        for iid in self.tree.get_children():
+            if _is_group(iid):
+                yield from self.tree.get_children(iid)
+            else:
+                yield iid
+
     def refresh_tree(self):
         sel = set(self.tree.selection())
         self.tree.delete(*self.tree.get_children())
-        for e in self.library.snapshot()[0]:
-            if e.kind == KIND_IGNORE and not self.show_ignored.get():
-                continue
+        entries = [e for e in self.library.snapshot()[0]
+                   if e.kind != KIND_IGNORE or self.show_ignored.get()]
+        groups = self.settings["groups"]
+        if groups:
+            # Group headers, then the Ungrouped section last.
+            collapsed = set(self.settings["groups_collapsed"])
+            for g in groups + [None]:
+                n = sum(1 for e in entries if self._entry_group(e) == g)
+                self.tree.insert("", "end", iid=_group_iid(g), open=(g or "") not in collapsed,
+                                 values=("", "%s  (%d)" % (g or "Ungrouped", n)) + ("",) * 5,
+                                 tags=("group",))
+        for e in entries:
             if e.id not in self._thumbs:
                 self._thumbs[e.id] = to_photo(thumb(e.image, 32))
-            self.tree.insert("", "end", iid=e.id, image=self._thumbs[e.id],
+            parent = _group_iid(self._entry_group(e)) if groups else ""
+            self.tree.insert(parent, "end", iid=e.id, image=self._thumbs[e.id],
                              values=self._row_values(e),
                              tags=("ignored",) if e.kind == KIND_IGNORE else ())
         keep = [i for i in sel if self.tree.exists(i)]
@@ -272,8 +315,22 @@ class App:
             self.library.update(e.id, mode="white" if e.mode == "gray" else "gray")
         self.refresh_tree()
 
+    def _on_double_click(self, ev):
+        row = self.tree.identify_row(ev.y)
+        if _is_group(row):
+            self.tree.item(row, open=not self.tree.item(row, "open"))
+            self._save_group_state()
+            return "break"
+        self.toggle_pin()
+        return None
+
     def rename(self):
         sel = self._selected()
+        if not sel:
+            groups = self._selected_groups()
+            if len(groups) == 1:
+                self.rename_group(groups[0])
+            return
         if len(sel) != 1:
             return
         name = simpledialog.askstring("BuffWatch", "Name:", initialvalue=sel[0].name,
@@ -297,18 +354,21 @@ class App:
             self.library.update(e.id, threshold=round(v, 2) if v >= 0.3 else None)
         self.refresh_tree()
 
-    # Drag-and-drop reordering: rows move live under the cursor, the order is saved on release.
+    # Drag-and-drop: rows move live under the cursor, the order is saved on release. Buff
+    # rows can be dropped into another group (onto its header = at its top); a group's
+    # header drags the whole group. The Ungrouped section always stays last.
     def _dnd_press(self, ev):
         self._dnd = None
         if self.tree.identify_region(ev.x, ev.y) not in ("tree", "cell"):
             return None
         row = self.tree.identify_row(ev.y)
-        if not row:
+        if not row or row == _group_iid(None):
             return None
-        self._dnd = {"y": ev.y, "row": row, "moved": False, "keep_sel": False}
+        self._dnd = {"y": ev.y, "row": row, "moved": False, "keep_sel": False,
+                     "group": _is_group(row)}
         # Pressing on an already selected row (no Ctrl/Shift) keeps the selection so the
-        # whole group can be dragged; a plain click without dragging selects just that row.
-        if row in self.tree.selection() and not ev.state & 0x0005:
+        # whole selection can be dragged; a plain click without dragging selects just that row.
+        if not _is_group(row) and row in self.tree.selection() and not ev.state & 0x0005:
             self._dnd["keep_sel"] = True
             return "break"
         return None
@@ -322,32 +382,55 @@ class App:
                 return
             d["moved"] = True
             self.tree.configure(cursor="fleur")
-        rows = list(self.tree.get_children())
-        moving = [i for i in rows if i in set(self.tree.selection())] or [d["row"]]
-        rest = [i for i in rows if i not in moving]
         height = self.tree.winfo_height()
         if ev.y < 0:
             self.tree.yview_scroll(-1, "units")
         elif ev.y > height:
             self.tree.yview_scroll(1, "units")
         target = self.tree.identify_row(min(max(ev.y, 0), height - 1))
+        if d["group"]:
+            self._dnd_move_group(d["row"], target)
+            return
+        sel = set(self.tree.selection())
+        moving = [i for i in self._tree_entries() if i in sel] or [d["row"]]
         if target in moving:
             return
-        if target:
+        top = ev.y < height / 2
+        if target and _is_group(target):
+            parent, idx = target, 0
+        elif target:
+            parent = self.tree.parent(target)
+        else:
+            # Over the heading or the empty space below the last row.
+            if top and self.tree.yview()[0] > 0:
+                return
+            tops = self.tree.get_children()
+            parent = (tops[0] if top else tops[-1]) if self.settings["groups"] else ""
+        rows = list(self.tree.get_children(parent))
+        rest = [i for i in rows if i not in moving]
+        if target and not _is_group(target):
             idx = rest.index(target)
             bbox = self.tree.bbox(target)
             if bbox and ev.y > bbox[1] + bbox[3] / 2:
                 idx += 1
-        else:
-            # Over the heading or the empty space below the last row.
-            top = ev.y < height / 2
-            if top and self.tree.yview()[0] > 0:
-                return
+        elif not target:
             idx = 0 if top else len(rest)
         new = rest[:idx] + moving + rest[idx:]
         if new != rows:
             for n, iid in enumerate(new):
-                self.tree.move(iid, "", n)
+                self.tree.move(iid, parent, n)
+
+    def _dnd_move_group(self, row, target):
+        if target and not _is_group(target):
+            target = self.tree.parent(target)
+        if not target or target in (row, _group_iid(None)):
+            return
+        tops = list(self.tree.get_children())
+        new = [i for i in tops if i != row]
+        idx = new.index(target) + (tops.index(target) > tops.index(row))
+        new.insert(idx, row)
+        for n, iid in enumerate(new):
+            self.tree.move(iid, "", n)
 
     def _dnd_release(self, ev):
         d, self._dnd = self._dnd, None
@@ -355,13 +438,113 @@ class App:
             return
         if d["moved"]:
             self.tree.configure(cursor="")
-            self.library.reorder(self.tree.get_children())
+            if d["group"]:
+                self.settings["groups"] = [_group_name(i) for i in self.tree.get_children()
+                                           if _group_name(i)]
+            else:
+                for top in self.tree.get_children():
+                    if not _is_group(top):
+                        continue
+                    for iid in self.tree.get_children(top):
+                        e = self.library.get(iid)
+                        if e and e.group != _group_name(top):
+                            self.library.update(iid, group=_group_name(top))
+            self.library.reorder(list(self._tree_entries()))
+            self._groups_changed()
         elif d["keep_sel"]:
             self.tree.selection_set(d["row"])
             self.tree.focus(d["row"])
 
+    # ------------------------------------------------------------ groups
+    def _selected_groups(self):
+        """Names of the selected group headers (the Ungrouped section excluded)."""
+        return [_group_name(i) for i in self.tree.selection()
+                if _is_group(i) and _group_name(i)]
+
+    def _ask_group_name(self, prompt, initial=""):
+        name = simpledialog.askstring("BuffWatch", prompt, initialvalue=initial,
+                                      parent=self.root)
+        return name.strip() if name else None
+
+    def _groups_changed(self):
+        """Save the group settings and keep the library (and so the overlay) in list order."""
+        self.save_settings()
+        self.refresh_tree()
+        self.library.reorder(list(self._tree_entries()))
+
+    def _save_group_state(self):
+        if not self.settings["groups"]:
+            return
+        collapsed = [_group_name(i) or "" for i in self.tree.get_children()
+                     if _is_group(i) and not self.tree.item(i, "open")]
+        if collapsed != self.settings["groups_collapsed"]:
+            self.settings["groups_collapsed"] = collapsed
+            self.save_settings()
+
+    def new_group(self):
+        name = self._ask_group_name("New group name (the selected buffs are moved into it):")
+        if not name:
+            return
+        if name in self.settings["groups"]:
+            messagebox.showinfo("BuffWatch", "There is already a group called '%s'." % name,
+                                parent=self.root)
+            return
+        self.settings["groups"].append(name)
+        for e in self._selected():
+            self.library.update(e.id, group=name)
+        self._groups_changed()
+
+    def move_to_group(self):
+        sel = self._selected()
+        if not sel:
+            messagebox.showinfo("BuffWatch", "Select one or more buffs first.", parent=self.root)
+            return
+        groups = self.settings["groups"]
+        prompt = "Move to group (a new name creates the group, empty = Ungrouped):"
+        if groups:
+            prompt += "\n\nGroups: " + ", ".join(groups)
+        name = simpledialog.askstring("BuffWatch", prompt, parent=self.root)
+        if name is None:
+            return
+        name = name.strip() or None
+        if name and name not in groups:
+            groups.append(name)
+        for e in sel:
+            self.library.update(e.id, group=name)
+        self._groups_changed()
+
+    def rename_group(self, old):
+        new = self._ask_group_name("Group name:", old)
+        if not new or new == old:
+            return
+        groups = self.settings["groups"]
+        if new in groups:
+            messagebox.showinfo("BuffWatch", "There is already a group called '%s'." % new,
+                                parent=self.root)
+            return
+        groups[groups.index(old)] = new
+        self.settings["groups_collapsed"] = [new if g == old else g
+                                             for g in self.settings["groups_collapsed"]]
+        self.library.rename_group(old, new)
+        self._groups_changed()
+
+    def delete_groups(self, names):
+        if not messagebox.askyesno(
+                "BuffWatch", "Delete group(s) %s? Their buffs move to Ungrouped."
+                % ", ".join("'%s'" % n for n in names), parent=self.root):
+            return
+        for n in names:
+            self.settings["groups"].remove(n)
+            self.library.rename_group(n, None)
+        self.settings["groups_collapsed"] = [g for g in self.settings["groups_collapsed"]
+                                             if g not in names]
+        self._groups_changed()
+
     def delete(self):
         sel = self._selected()
+        if not sel and self._selected_groups():
+            self.delete_groups(self._selected_groups())
+            return
         if sel and messagebox.askyesno("BuffWatch", "Delete %d icon(s)?" % len(sel),
                                        parent=self.root):
             for e in sel:
