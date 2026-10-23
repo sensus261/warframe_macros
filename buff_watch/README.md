@@ -123,6 +123,11 @@ up or share them, copy that folder.
   when an icon is briefly covered by a damage number or a flash.
 - **Scans per second.** 8 is plenty and costs very little CPU, because only the small buff
   area is captured.
+- **Organising the Buffs list.** Drag rows to reorder them; the overlay shows pinned buffs
+  in the same order. *New group...* makes a collapsible group (the selected buffs go into
+  it), and you can drag buffs between groups or drag a group's header to move the whole
+  group. Select a header to rename or delete it. Groups only tidy the list, they don't
+  change what the overlay shows.
 - The live preview at the top of the window draws boxes around icons: green for known buffs,
   grey for ignored icons, yellow for new ones.
 
