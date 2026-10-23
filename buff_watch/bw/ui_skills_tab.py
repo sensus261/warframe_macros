@@ -8,6 +8,7 @@ import cv2
 
 from .skills import (N_SLOTS, SlotState, active_profile, new_profile, profiles,
                      slot_settings)
+from . import ui_theme as th
 from .ui_common import to_photo
 from .ui_dialogs import KeyEntry, RegionPicker
 
@@ -17,7 +18,7 @@ COLUMNS = ("Slot", "Live", "Name", "Status", "Auto-press", "Key", "Press early (
 
 class SkillsTab(ttk.Frame):
     def __init__(self, parent, app):
-        super().__init__(parent, padding=8)
+        super().__init__(parent, padding=14)
         self.app = app
         self.rows = []
         self._photos = [None] * N_SLOTS
@@ -28,11 +29,11 @@ class SkillsTab(ttk.Frame):
         self.enabled = tk.BooleanVar(value=sk["enabled"])
         ttk.Checkbutton(top, text="Watch abilities", variable=self.enabled,
                         command=self._enabled_changed).pack(side="left")
-        ttk.Button(top, text="Select ability area...",
+        ttk.Button(top, text="Select ability area...", style="Accent.TButton",
                    command=self.pick_region).pack(side="left", padx=(12, 4))
         ttk.Button(top, text="Capture ready icons",
                    command=self.capture_icons).pack(side="left", padx=4)
-        self.info = ttk.Label(top, foreground="#666")
+        self.info = ttk.Label(top, style="Muted.TLabel")
         self.info.pack(side="left", padx=12)
 
         prof = ttk.Frame(self)
@@ -66,7 +67,7 @@ class SkillsTab(ttk.Frame):
         ttk.Button(en, text="Select energy bar...",
                    command=self.pick_energy_bar).pack(side="left", padx=12)
 
-        ttk.Label(self, wraplength=900, justify="left", foreground="#444", text=(
+        ttk.Label(self, wraplength=900, justify="left", style="Muted.TLabel", text=(
             "BuffWatch reads the seconds Warframe shows over an ability while it is active. "
             "Auto-press taps the slot's key when that timer ends, or the set number of "
             "seconds before, and keeps tapping every few seconds until a new timer shows "
@@ -78,14 +79,14 @@ class SkillsTab(ttk.Frame):
         g = ttk.Frame(self)
         g.grid(row=4, column=0, sticky="w")
         for c, text in enumerate(COLUMNS):
-            ttk.Label(g, text=text, font=("Segoe UI", 9, "bold")).grid(
+            ttk.Label(g, text=text.upper(), style="Section.TLabel").grid(
                 row=0, column=c, sticky="w", padx=4)
         for i in range(N_SLOTS):
             self.rows.append(self._row(g, i))
 
         bottom = ttk.Frame(self)
         bottom.grid(row=5, column=0, sticky="we", pady=(10, 0))
-        self.digits = ttk.Label(bottom, foreground="#666")
+        self.digits = ttk.Label(bottom, style="Muted.TLabel")
         self.digits.pack(side="left")
         ttk.Button(bottom, text="Re-detect HUD scale",
                    command=self._reset_scale).pack(side="right")
@@ -198,7 +199,7 @@ class SkillsTab(ttk.Frame):
         r = i + 1
         w = {}
         ttk.Label(g, text=str(i + 1)).grid(row=r, column=0, padx=4)
-        w["live"] = tk.Label(g, bg="black", width=6, height=3)
+        w["live"] = tk.Label(g, bg=th.INPUT, width=6, height=3)
         w["live"].grid(row=r, column=1, padx=4, pady=2)
         w["name"] = tk.StringVar(value=cfg["name"])
         e = ttk.Entry(g, textvariable=w["name"], width=16)

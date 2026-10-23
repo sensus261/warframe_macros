@@ -2,19 +2,19 @@
 
 Things we agreed to do later. Start one by asking for it in a new thread.
 
-## BuffWatch UI/UX overhaul
+## BuffWatch UI/UX
 
-BuffWatch works, but its main window looks dated and is hard to find your way around
-(plain Tk widgets, long tabs of buttons). Give it the same care as the launcher:
+The first pass is done (dark theme matching the launcher, new header and toolbar, Buffs
+actions folded into *Edit* / *Groups* menus and a right-click menu, restyled tabs and
+dialogs). Ideas for a second pass:
 
-- [ ] Restyle the main window to match the launcher (dark theme, cards, clear primary actions).
-- [ ] Rethink the tabs (*Buffs overlay*, *New buffs detections*, *Abilities*, settings) and
-      the dialogs (teach an icon, add from catalog, auto-press) so the common tasks are
-      obvious and the rare ones are out of the way.
-- [ ] Keep every feature and setting working, and keep config export / import compatible
-      with zips made by the current version.
+- [ ] Fewer tabs: merge *Detection* and *Auto-press* into one settings page, and the two
+      overlay tabs into one with a buffs / skills switch.
+- [ ] The Skills tab's slot table is wider than a small window; turn it into one card per
+      slot.
+- [ ] Let the live preview collapse to give the lists more room.
 
-## Launcher
+## Testing
 
-- [ ] Try it on Windows with AutoHotkey v1 installed and the real game (only tested on
-      Linux so far, with stand-in processes).
+- [ ] Try the launcher and the restyled BuffWatch on Windows with AutoHotkey v1 and the real
+      game (only tested on Linux so far, with stand-in processes and a fake screenshot).

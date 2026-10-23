@@ -5,7 +5,7 @@ from tkinter import messagebox, ttk
 
 import cv2
 
-from . import keys
+from . import keys, ui_theme as th
 from .ui_common import to_photo
 
 
@@ -65,7 +65,7 @@ class RegionPicker(tk.Toplevel):
         self.drag.set(x0 * self.img_w, y0 * self.img_h, x1 * self.img_w, y1 * self.img_h)
         bar = ttk.Frame(self)
         bar.pack(fill="x", pady=4)
-        ttk.Button(bar, text="Save", command=self._ok).pack(side="right", padx=6)
+        ttk.Button(bar, text="Save", style="Accent.TButton", command=self._ok).pack(side="right", padx=6)
         ttk.Button(bar, text="Cancel", command=self.destroy).pack(side="right")
         self.bind("<Return>", lambda e: self._ok())
         self.bind("<Escape>", lambda e: self.destroy())
@@ -114,7 +114,8 @@ class BoxPicker(tk.Toplevel):
         ent.pack(side="left", padx=4)
         self.pin = tk.BooleanVar(value=True)
         ttk.Checkbutton(form, text="Show in overlay", variable=self.pin).pack(side="left", padx=8)
-        ttk.Button(form, text="Save buff", command=lambda: self._ok("buff")).pack(side="right")
+        ttk.Button(form, text="Save buff", style="Accent.TButton",
+                   command=lambda: self._ok("buff")).pack(side="right")
         ttk.Button(form, text="Not a buff (ignore)",
                    command=lambda: self._ok("ignore")).pack(side="right", padx=4)
         ttk.Button(form, text="Cancel", command=self.destroy).pack(side="right", padx=4)
@@ -172,14 +173,15 @@ class CatalogPicker(tk.Toplevel):
         self.lb.bind("<Double-1>", lambda e: self._ok(True))
         side = ttk.Frame(mid, padding=(10, 0))
         side.pack(side="left", fill="y")
-        self.preview = tk.Label(side, bg="black")
+        self.preview = tk.Label(side, bg=th.INPUT)
         self.preview.pack(anchor="n")
         self.info = ttk.Label(side, wraplength=220, justify="left")
         self.info.pack(anchor="n", pady=6)
 
         bar = ttk.Frame(self, padding=6)
         bar.pack(fill="x")
-        ttk.Button(bar, text="Add + show in overlay", command=lambda: self._ok(True)).pack(side="right")
+        ttk.Button(bar, text="Add + show in overlay", style="Accent.TButton",
+                   command=lambda: self._ok(True)).pack(side="right")
         ttk.Button(bar, text="Add", command=lambda: self._ok(False)).pack(side="right", padx=4)
         ttk.Button(bar, text="Cancel", command=self.destroy).pack(side="right")
         self.bind("<Return>", lambda e: self._ok(True))
@@ -293,8 +295,8 @@ class DescriptionDialog(tk.Toplevel):
         self.text.insert("1.0", entry.description or "")
         bar = ttk.Frame(f)
         bar.pack(fill="x", pady=(8, 0))
-        ttk.Label(bar, foreground="#666", text="Ctrl+Enter saves").pack(side="left")
-        ttk.Button(bar, text="Save", command=self._ok).pack(side="right")
+        ttk.Label(bar, style="Muted.TLabel", text="Ctrl+Enter saves").pack(side="left")
+        ttk.Button(bar, text="Save", style="Accent.TButton", command=self._ok).pack(side="right")
         ttk.Button(bar, text="Cancel", command=self.destroy).pack(side="right", padx=4)
         self.text.bind("<Control-Return>", lambda e: (self._ok(), "break")[1])
         self.bind("<Escape>", lambda e: self.destroy())
@@ -340,9 +342,10 @@ class Tooltip:
         self.tip = tk.Toplevel(self.tree)
         self.tip.wm_overrideredirect(True)
         self.tip.wm_geometry("+%d+%d" % (x, y))
-        tk.Label(self.tip, text=text, justify="left", wraplength=360, background="#ffffe8",
+        tk.Label(self.tip, text=text, justify="left", wraplength=360, background=th.CARD_HOVER,
+                 foreground=th.TEXT,
                  relief="solid", borderwidth=1, padx=6, pady=4,
-                 font=("Segoe UI", 9)).pack()
+                 font=th.font(9)).pack()
 
     def _hide(self):
         if self.job:
@@ -370,13 +373,13 @@ class AutoKeyDialog(tk.Toplevel):
         ttk.Label(f, text="Key:").grid(row=1, column=0, sticky="w")
         self.key = KeyEntry(f, entry.key or "")
         self.key.grid(row=1, column=1, sticky="w")
-        ttk.Label(f, foreground="#666", text="e.g. 4, shift+e, f5, mouse4").grid(
+        ttk.Label(f, style="Muted.TLabel", text="e.g. 4, shift+e, f5, mouse4").grid(
             row=2, column=1, sticky="w")
         ttk.Label(f, text="Press every (ms):").grid(row=3, column=0, sticky="w", pady=(8, 0))
         self.interval = tk.IntVar(value=entry.key_interval)
         ttk.Spinbox(f, from_=300, to=30000, increment=100, textvariable=self.interval,
                     width=8).grid(row=3, column=1, sticky="w", pady=(8, 0))
-        ttk.Label(f, foreground="#666", wraplength=300, justify="left",
+        ttk.Label(f, style="Muted.TLabel", wraplength=300, justify="left",
                   text="Longer than the cast animation, or a second press may cancel it."
                   ).grid(row=4, column=1, sticky="w")
         ttk.Label(f, text="Give up after (presses):").grid(row=5, column=0, sticky="w", pady=(8, 0))
@@ -385,7 +388,7 @@ class AutoKeyDialog(tk.Toplevel):
             row=5, column=1, sticky="w", pady=(8, 0))
         bar = ttk.Frame(f)
         bar.grid(row=6, column=0, columnspan=2, sticky="e", pady=(12, 0))
-        ttk.Button(bar, text="Save", command=self._ok).pack(side="right")
+        ttk.Button(bar, text="Save", style="Accent.TButton", command=self._ok).pack(side="right")
         ttk.Button(bar, text="Turn off", command=self._off).pack(side="right", padx=4)
         ttk.Button(bar, text="Cancel", command=self.destroy).pack(side="right")
         self.bind("<Escape>", lambda e: self.destroy())

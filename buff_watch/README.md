@@ -7,13 +7,13 @@ corner of the screen, recognises the icons you taught it, and shows the ones you
 
 - **Live magnified view.** The overlay shows the real pixels from the game, so stack counts,
   percentages and timers stay current without any OCR.
-- **"Off" state.** A pinned buff that isn't active stays in the overlay, dimmed. Tick
-  *Warn when missing* and its name turns red with a red border, so a buff that runs out is
+- **"Off" state.** A pinned buff that isn't active stays in the overlay, dimmed. Turn on
+  *Warn when missing* (Buffs tab, *Edit* menu) and its name turns red with a red border, so a buff that runs out is
   easy to spot. The border also flashes yellow briefly when a buff turns on or off.
 - **Built-in catalog of ~270 buff icons** (from [semlar.com/buffs](https://semlar.com/buffs)).
   When a new icon shows up, BuffWatch looks it up in the catalog:
   - **Certain match:** it's named automatically, for example "Recognised: Mod: Growing
-    Power" in the status bar.
+    Power" next to the title.
   - **Possible matches:** the *New buffs detections* tab shows the top candidates as one-click buttons.
   - **No match:** you type a name, or mark it "not a buff". The catalog is from around 2020,
     so newer arcanes and Incarnon/Citrine-era buffs often aren't in it.
@@ -172,7 +172,7 @@ other windows on top of exclusive fullscreen, and capturing it may give a black 
    come and go: pick bottom-right for an overlay in the bottom-right of the screen.
 
 Your icons and settings are saved in the `data` folder next to the program. To back them
-up, share them or move them to another PC, use **Export / Import** in the top bar:
+up, share them or move them to another PC, use the **Configuration** menu in the top right:
 **Export configuration...** writes everything (settings, overlay layouts, buffs, captured
 icons, skill profiles and learned digits) to one zip file, and **Import configuration...**
 replaces the whole configuration with such a zip and restarts BuffWatch. Before importing,
@@ -188,14 +188,14 @@ get their defaults.
 - **Detection tab, catalog options.** *Name new icons by myself* turns the automatic naming
   on or off. *Only ask about icons that are in the catalog* stops BuffWatch asking about
   anything the catalog doesn't know. That cuts false alarms, but it also hides newer buffs.
-- **Coloured icon** (Buffs tab). Matching normally looks only at white/grey pixels so the
+- **Coloured icon** (Buffs tab, *Edit* menu or right-click a row). Matching normally looks only at white/grey pixels so the
   scenery behind the HUD doesn't interfere. Turn this on for an icon that isn't white.
 - **Frames a buff may be unseen before it counts as off.** Stops the overlay flickering
   when an icon is briefly covered by a damage number or a flash.
 - **Scans per second.** 8 is plenty and costs very little CPU, because only the small buff
   area is captured.
 - **Organising the Buffs list.** Drag rows to reorder them; the overlay shows pinned buffs
-  in the same order. *New group...* makes a collapsible group (the selected buffs go into
+  in the same order. *Groups → New group...* makes a collapsible group (the selected buffs go into
   it), and you can drag buffs between groups or drag a group's header to move the whole
   group. Select a header to rename or delete it. Groups only tidy the list, they don't
   change what the overlay shows.

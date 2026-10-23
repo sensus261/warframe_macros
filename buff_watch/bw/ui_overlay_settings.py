@@ -124,7 +124,7 @@ class OverlaySettingsTab(_Scrolled):
         bottom.grid(row=3, column=0, columnspan=2, sticky="we", pady=(8, 0))
         ttk.Button(bottom, text="Reset overlay to defaults",
                    command=self._reset).pack(side="left")
-        ttk.Label(f, foreground="#666", wraplength=700, justify="left", text=(
+        ttk.Label(f, style="Muted.TLabel", wraplength=700, justify="left", text=(
             "Drag the overlay by any of its cells to move it, then tick 'Lock overlay'. While "
             "unlocked, right-click it for a quick menu and use the mouse wheel to zoom. The corner "
             "that stays put keeps its place while buffs come and go, so pick bottom-right for "

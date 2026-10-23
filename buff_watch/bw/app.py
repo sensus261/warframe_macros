@@ -10,7 +10,7 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 
 import cv2
 
-from . import backup, config, keys, winutil
+from . import backup, config, keys, ui_theme as th, winutil
 from .autokey import AutoKey
 from .capture import CaptureError, ImageSource, ScreenSource, list_monitors
 from .catalog import Catalog
@@ -71,8 +71,7 @@ class App:
         self.root.title("BuffWatch")
         self.root.minsize(780, 560)
         self.root.protocol("WM_DELETE_WINDOW", self.quit)
-        style = ttk.Style(self.root)
-        style.configure("Treeview", rowheight=36)
+        th.apply(self.root)
         self._build()
         self.overlay = Overlay(self)
         self.overlay.apply_settings()
@@ -83,37 +82,44 @@ class App:
     # ================================================================ layout
     def _build(self):
         r = self.root
-        top = ttk.Frame(r, padding=6)
-        top.pack(fill="x")
-        ttk.Label(top, text="Capture:").pack(side="left")
-        self.source_var = tk.StringVar()
-        self.source_box = ttk.Combobox(top, textvariable=self.source_var, width=34,
-                                       state="readonly")
-        self.source_box.pack(side="left", padx=4)
-        self.source_box.bind("<<ComboboxSelected>>", self._source_changed)
-        self.source_box.bind("<Button-1>", lambda e: self._fill_sources())
-        ttk.Button(top, text="Select buff area...", command=self.pick_region).pack(side="left", padx=4)
-        ttk.Button(top, text="Teach icon...", command=self.teach).pack(side="left", padx=4)
-        cfg = ttk.Menubutton(top, text="Export / Import")
+        # Header: name and live status on the left, configuration menu on the right.
+        head = ttk.Frame(r, style="Header.TFrame", padding=(16, 10))
+        head.pack(fill="x")
+        ttk.Label(head, text="BuffWatch", style="HeaderTitle.TLabel").pack(side="left")
+        self.status = ttk.Label(head, text="starting...", style="HeaderMuted.TLabel")
+        self.status.pack(side="left", padx=(16, 0), pady=(3, 0))
+        cfg = ttk.Menubutton(head, text="Configuration")
         menu = tk.Menu(cfg, tearoff=False)
         menu.add_command(label="Export configuration...", command=self.export_config)
         menu.add_command(label="Import configuration...", command=self.import_config)
         menu.add_separator()
         menu.add_command(label="Open data folder", command=self.open_data_folder)
         cfg["menu"] = menu
-        cfg.pack(side="left", padx=4)
+        cfg.pack(side="right")
+
+        # Toolbar: what to watch, and the two set-up actions.
+        top = ttk.Frame(r, padding=(16, 10, 16, 8))
+        top.pack(fill="x")
+        ttk.Label(top, text="Capture", style="Muted.TLabel").pack(side="left")
+        self.source_var = tk.StringVar()
+        self.source_box = ttk.Combobox(top, textvariable=self.source_var, width=34,
+                                       state="readonly")
+        self.source_box.pack(side="left", padx=(8, 12))
+        self.source_box.bind("<<ComboboxSelected>>", self._source_changed)
+        self.source_box.bind("<Button-1>", lambda e: self._fill_sources())
         self.pause_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(top, text="Pause", variable=self.pause_var,
-                        command=self._pause_changed).pack(side="left", padx=8)
-        self.status = ttk.Label(top, text="starting...", foreground="#666")
-        self.status.pack(side="right")
+                        command=self._pause_changed).pack(side="left")
+        ttk.Button(top, text="Teach icon...", command=self.teach).pack(side="right")
+        ttk.Button(top, text="Select buff area...", style="Accent.TButton",
+                   command=self.pick_region).pack(side="right", padx=(0, 8))
         self._fill_sources()
 
-        self.preview = ttk.Label(r, anchor="center", background="black")
-        self.preview.pack(fill="x", padx=6)
+        self.preview = ttk.Label(r, anchor="center", style="Preview.TLabel")
+        self.preview.pack(fill="x", padx=16)
 
         self.nb = ttk.Notebook(r)
-        self.nb.pack(fill="both", expand=True, padx=6, pady=6)
+        self.nb.pack(fill="both", expand=True, padx=16, pady=(12, 14))
         self._build_library_tab()
         self._build_unknown_tab()
         self._build_overlay_tab()
@@ -168,7 +174,7 @@ class App:
 
     # ------------------------------------------------------------ library tab
     def _build_library_tab(self):
-        f = ttk.Frame(self.nb, padding=4)
+        f = ttk.Frame(self.nb, padding=(10, 10, 10, 8))
         self.nb.add(f, text="Buffs")
         cols = ("pin", "name", "desc", "status", "auto", "score", "thr", "opts")
         self.tree = ttk.Treeview(f, columns=cols, height=8, selectmode="extended")
@@ -181,14 +187,15 @@ class App:
             self.tree.heading(c, text=t)
             self.tree.column(c, width=w, stretch=c in ("name", "desc"),
                              anchor="w" if c in ("name", "desc", "opts", "auto") else "center")
-        self.tree.tag_configure("on", foreground="#0a7a20")
-        self.tree.tag_configure("ignored", foreground="#999")
-        self.tree.tag_configure("group", font=("Segoe UI", 10, "bold"), background="#e8ecf2")
+        self.tree.tag_configure("on", foreground=th.GREEN)
+        self.tree.tag_configure("ignored", foreground=th.FAINT)
+        self.tree.tag_configure("group", font=th.font(10, "bold"), background=th.HEADER)
         sb = ttk.Scrollbar(f, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=sb.set)
         self.tree.grid(row=0, column=0, sticky="nsew")
         sb.grid(row=0, column=1, sticky="ns")
         self.tree.bind("<Double-1>", self._on_double_click)
+        self.tree.bind("<Button-3>", self._row_menu)
         Tooltip(self.tree, self._row_tooltip)
         for ev in ("<<TreeviewOpen>>", "<<TreeviewClose>>"):
             # Fired before the row actually opens/closes, so read the state afterwards.
@@ -199,34 +206,74 @@ class App:
         f.rowconfigure(0, weight=1)
         f.columnconfigure(0, weight=1)
 
+        # The everyday actions as buttons; the rest in two small menus and on right-click.
         bar = ttk.Frame(f)
-        bar.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(6, 0))
-        for text, cmd in (("Add from catalog...", self.add_from_catalog),
-                          ("Show / hide in overlay", self.toggle_pin),
-                          ("Auto-press key...", self.set_autokey),
-                          ("Rename", self.rename), ("Description...", self.set_description),
-                          ("Threshold...", self.set_threshold)):
-            ttk.Button(bar, text=text, command=cmd).pack(side="left", padx=2)
-        bar2 = ttk.Frame(f)
-        bar2.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(4, 0))
-        for text, cmd in (("Warn when missing", self.toggle_alert),
-                          ("Coloured icon", self.toggle_mode),
-                          ("New group...", self.new_group),
-                          ("Move to group...", self.move_to_group),
-                          ("Delete", self.delete)):
-            ttk.Button(bar2, text=text, command=cmd).pack(side="left", padx=2)
+        bar.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(10, 0))
+        ttk.Button(bar, text="Add from catalog...", style="Accent.TButton",
+                   command=self.add_from_catalog).pack(side="left")
+        for text, cmd in (("Show / hide in overlay", self.toggle_pin),
+                          ("Auto-press key...", self.set_autokey)):
+            ttk.Button(bar, text=text, command=cmd).pack(side="left", padx=(6, 0))
+        edit = ttk.Menubutton(bar, text="Edit")
+        edit["menu"] = self._edit_menu(edit)
+        edit.pack(side="left", padx=(6, 0))
+        grp = ttk.Menubutton(bar, text="Groups")
+        grp["menu"] = self._group_menu(grp)
+        grp.pack(side="left", padx=(6, 0))
+        ttk.Button(bar, text="Delete", style="Danger.TButton",
+                   command=self.delete).pack(side="right")
         self.show_ignored = tk.BooleanVar(value=False)
-        ttk.Checkbutton(bar2, text="Show ignored", variable=self.show_ignored,
-                        command=self.refresh_tree).pack(side="right")
-        ttk.Label(f, foreground="#666", text=(
+        ttk.Checkbutton(bar, text="Show ignored", variable=self.show_ignored,
+                        command=self.refresh_tree).pack(
+            side="right", padx=(0, 12))
+        help_text = ttk.Label(f, style="Muted.TLabel", justify="left", text=(
             "Double-click a row to show/hide it in the overlay (double-click its description "
-            "to edit it; hover a row to read all of it). Drag rows to reorder them or "
-            "to move them into another group; drag a group's header to reorder groups. Select "
-            "several rows with Ctrl/Shift. Select a group's header to rename or delete it. "
-            "'Coloured icon' matches in grayscale instead of white-only "
-            "(use it for icons that are not white).")).grid(
-            row=3, column=0, columnspan=2, sticky="w", pady=(4, 0))
+            "to edit it; hover a row to read all of it). Right-click a row for every action. "
+            "Drag rows to reorder them or to move them into another group; drag a group's "
+            "header to reorder groups. Select several rows with Ctrl/Shift. Select a group's "
+            "header to rename or delete it. 'Coloured icon' matches in grayscale instead of "
+            "white-only (use it for icons that are not white)."))
+        help_text.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(8, 0))
+        help_text.bind("<Configure>", lambda e: help_text.configure(wraplength=e.width))
         self.refresh_tree()
+
+    def _edit_menu(self, parent):
+        m = tk.Menu(parent, tearoff=False)
+        m.add_command(label="Rename", command=self.rename)
+        m.add_command(label="Description...", command=self.set_description)
+        m.add_command(label="Threshold...", command=self.set_threshold)
+        m.add_separator()
+        m.add_command(label="Warn when missing (on / off)", command=self.toggle_alert)
+        m.add_command(label="Coloured icon (on / off)", command=self.toggle_mode)
+        return m
+
+    def _group_menu(self, parent):
+        m = tk.Menu(parent, tearoff=False)
+        m.add_command(label="New group...", command=self.new_group)
+        m.add_command(label="Move to group...", command=self.move_to_group)
+        return m
+
+    def _row_menu(self, ev):
+        """Right-click: every action for the row under the mouse (and the selection)."""
+        row = self.tree.identify_row(ev.y)
+        if row and row not in self.tree.selection():
+            self.tree.selection_set(row)
+            self.tree.focus(row)
+        m = tk.Menu(self.tree, tearoff=False)
+        m.add_command(label="Show / hide in overlay", command=self.toggle_pin)
+        m.add_command(label="Auto-press key...", command=self.set_autokey)
+        m.add_separator()
+        m.add_command(label="Rename", command=self.rename)
+        m.add_command(label="Description...", command=self.set_description)
+        m.add_command(label="Threshold...", command=self.set_threshold)
+        m.add_command(label="Warn when missing (on / off)", command=self.toggle_alert)
+        m.add_command(label="Coloured icon (on / off)", command=self.toggle_mode)
+        m.add_separator()
+        m.add_command(label="New group...", command=self.new_group)
+        m.add_command(label="Move to group...", command=self.move_to_group)
+        m.add_separator()
+        m.add_command(label="Delete", command=self.delete)
+        m.tk_popup(ev.x_root, ev.y_root)
 
     def _selected(self):
         return [self.library.get(i) for i in self.tree.selection() if self.library.get(i)]
@@ -608,42 +655,44 @@ class App:
 
     # ------------------------------------------------------------ unknown tab
     def _build_unknown_tab(self):
-        f = ttk.Frame(self.nb, padding=8)
+        f = ttk.Frame(self.nb, padding=14)
         self.unknown_tab = f
         self.nb.add(f, text="New buffs detections")
-        self.unk_title = ttk.Label(f, text="No new icons.", font=("Segoe UI", 11, "bold"))
-        self.unk_title.grid(row=0, column=0, columnspan=3, sticky="w")
-        self.unk_img = ttk.Label(f)
-        self.unk_img.grid(row=1, column=0, rowspan=5, padx=(0, 12), pady=6, sticky="n")
-        self.unk_ctx = ttk.Label(f)
-        self.unk_ctx.grid(row=6, column=0, columnspan=3, sticky="w")
-        self.unk_sugg_label = ttk.Label(f, text="")
+        self.unk_title = ttk.Label(f, text="No new icons.", style="Title.TLabel")
+        self.unk_title.grid(row=0, column=0, columnspan=3, sticky="w", pady=(0, 8))
+        self.unk_img = ttk.Label(f, style="Preview.TLabel")
+        self.unk_img.grid(row=1, column=0, rowspan=5, padx=(0, 16), pady=6, sticky="n")
+        self.unk_ctx = ttk.Label(f, style="Preview.TLabel")
+        self.unk_ctx.grid(row=6, column=0, columnspan=3, sticky="w", pady=(10, 0))
+        self.unk_sugg_label = ttk.Label(f, text="", style="Muted.TLabel")
         self.unk_sugg_label.grid(row=1, column=1, columnspan=2, sticky="w")
         self.unk_sugg = ttk.Frame(f)
-        self.unk_sugg.grid(row=2, column=1, columnspan=2, sticky="w", pady=(2, 6))
-        ttk.Label(f, text="What is it?").grid(row=3, column=1, sticky="w")
+        self.unk_sugg.grid(row=2, column=1, columnspan=2, sticky="w", pady=(4, 10))
+        ttk.Label(f, text="What is it?").grid(row=3, column=1, sticky="w",
+                                                                   padx=(0, 8))
         self.unk_name = tk.StringVar()
         self.unk_entry = ttk.Combobox(f, textvariable=self.unk_name, width=40)
         self.unk_entry.grid(row=3, column=2, sticky="w")
         self.unk_entry.bind("<Return>", lambda e: self.unknown_save(True))
         self.unk_choice = None  # catalog Icon picked from the suggestions
         b = ttk.Frame(f)
-        b.grid(row=4, column=1, columnspan=2, sticky="w", pady=4)
-        ttk.Button(b, text="Save + show in overlay",
-                   command=lambda: self.unknown_save(True)).pack(side="left", padx=2)
-        ttk.Button(b, text="Save", command=lambda: self.unknown_save(False)).pack(side="left", padx=2)
-        ttk.Button(b, text="Fix the box...", command=self.unknown_adjust).pack(side="left", padx=2)
-        ttk.Button(b, text="Not a buff (ignore forever)",
-                   command=self.unknown_ignore).pack(side="left", padx=2)
-        ttk.Button(b, text="Skip for now", command=self.unknown_skip).pack(side="left", padx=2)
+        b.grid(row=4, column=1, columnspan=2, sticky="w", pady=(10, 4))
+        ttk.Button(b, text="Save + show in overlay", style="Accent.TButton",
+                   command=lambda: self.unknown_save(True)).pack(side="left")
+        ttk.Button(b, text="Save", command=lambda: self.unknown_save(False)).pack(side="left", padx=(6, 0))
+        ttk.Button(b, text="Fix the box...", command=self.unknown_adjust).pack(side="left", padx=(6, 0))
+        ttk.Button(b, text="Not a buff (ignore forever)", style="Danger.TButton",
+                   command=self.unknown_ignore).pack(side="left", padx=(6, 0))
         b2 = ttk.Frame(f)
         b2.grid(row=5, column=1, columnspan=2, sticky="nw")
-        ttk.Button(b2, text="< Prev", command=lambda: self.unknown_step(-1)).pack(side="left", padx=2)
-        ttk.Button(b2, text="Next >", command=lambda: self.unknown_step(1)).pack(side="left", padx=2)
-        ttk.Label(b2, foreground="#666", wraplength=440, justify="left", text=(
+        ttk.Button(b2, text="< Prev", command=lambda: self.unknown_step(-1)).pack(side="left")
+        ttk.Button(b2, text="Next >", command=lambda: self.unknown_step(1)).pack(side="left", padx=(6, 0))
+        ttk.Button(b2, text="Skip for now", command=self.unknown_skip).pack(side="left", padx=(6, 0))
+        ttk.Label(f, style="Muted.TLabel", wraplength=560, justify="left", text=(
             "Pick the matching icon from the catalog suggestions, or type a name. If the "
             "box cuts the icon or grabs the number under it, use 'Fix the box...'. If "
-            "nothing gets detected, use 'Teach icon...' at the top.")).pack(side="left", padx=12)
+            "nothing gets detected, use 'Teach icon...' at the top.")).grid(
+            row=7, column=0, columnspan=3, sticky="w", pady=(10, 0))
 
     def _current_unknown(self):
         if not self.unknowns:
@@ -689,10 +738,10 @@ class App:
             for m in sugg:
                 photo = to_photo(m.icon.thumb(40))
                 self._sugg_photos.append(photo)
-                ttk.Button(self.unk_sugg, image=photo, compound="left",
+                ttk.Button(self.unk_sugg, image=photo, compound="left", style="Suggestion.TButton",
                            text="%s\n%d%% match" % (m.icon.label[:40], round(m.score * 100)),
                            command=lambda ic=m.icon: self._pick_suggestion(ic)).pack(
-                    side="left", padx=2)
+                    side="left", padx=(0, 6))
             # Prefer a buff the user already added from the catalog but hasn't seen yet.
             waiting = [m for m in sugg if any(not e.learned for e in
                                              self.library.find_catalog(m.icon.file))]
@@ -783,77 +832,85 @@ class App:
 
     # ------------------------------------------------------------ settings tab
     def _build_settings_tab(self):
-        f = ttk.Frame(self.nb, padding=8)
+        f = ttk.Frame(self.nb, padding=14)
         self.nb.add(f, text="Detection")
+        f.columnconfigure(0, weight=1)
         s = self.settings
         self.set_vars = {}
+        match = ttk.LabelFrame(f, text="MATCHING", padding=(14, 8))
+        match.grid(row=0, column=0, sticky="ew")
         rows = (("match_threshold", "Default match threshold", 0.3, 0.99, 0.01),
                 ("fps", "Scans per second", 1, 30, 1),
                 ("miss_frames", "Frames a buff may be unseen before it counts as off", 0, 30, 1),
                 ("stable_frames", "Frames an unknown icon must stay put before asking", 2, 100, 1))
         for i, (key, text, lo, hi, step) in enumerate(rows):
-            ttk.Label(f, text=text).grid(row=i, column=0, sticky="w", pady=2)
+            ttk.Label(match, text=text).grid(row=i, column=0, sticky="w", pady=3)
             v = tk.DoubleVar(value=s[key])
             self.set_vars[key] = v
-            ttk.Spinbox(f, from_=lo, to=hi, increment=step, textvariable=v, width=7,
-                        command=self._settings_changed).grid(row=i, column=1, sticky="w", padx=6)
+            ttk.Spinbox(match, from_=lo, to=hi, increment=step, textvariable=v, width=7,
+                        command=self._settings_changed).grid(row=i, column=1, sticky="w", padx=12)
+        new = ttk.LabelFrame(f, text="NEW ICONS AND PREVIEW", padding=(14, 8))
+        new.grid(row=1, column=0, sticky="ew", pady=(14, 0))
         self.disc_var = tk.BooleanVar(value=s["discovery"])
-        ttk.Checkbutton(f, text="Detect new icons and ask me to name them", variable=self.disc_var,
-                        command=self._settings_changed).grid(row=len(rows), column=0, sticky="w", pady=4)
+        ttk.Checkbutton(new, text="Detect new icons and ask me to name them", variable=self.disc_var,
+                        command=self._settings_changed).grid(row=0, column=0, sticky="w", pady=3)
         self.prev_var = tk.BooleanVar(value=s["preview"])
-        ttk.Checkbutton(f, text="Live preview in this window", variable=self.prev_var,
-                        command=self._settings_changed).grid(row=len(rows) + 1, column=0, sticky="w")
+        ttk.Checkbutton(new, text="Live preview in this window", variable=self.prev_var,
+                        command=self._settings_changed).grid(row=1, column=0, sticky="w", pady=3)
         self.auto_var = tk.BooleanVar(value=s["catalog_auto_name"])
-        ttk.Checkbutton(f, text="Name new icons by myself when the catalog match is certain",
+        ttk.Checkbutton(new, text="Name new icons by myself when the catalog match is certain",
                         variable=self.auto_var, command=self._settings_changed).grid(
-            row=len(rows) + 2, column=0, sticky="w", pady=(4, 0))
+            row=2, column=0, sticky="w", pady=3)
         self.only_var = tk.BooleanVar(value=s["catalog_only"])
-        ttk.Checkbutton(f, text="Only ask about icons that are in the catalog "
-                                "(hides newer buffs the catalog doesn't have)",
+        ttk.Checkbutton(new, text="Only ask about icons that are in the catalog "
+                                  "(hides newer buffs the catalog doesn't have)",
                         variable=self.only_var, command=self._settings_changed).grid(
-            row=len(rows) + 3, column=0, sticky="w")
-        ttk.Label(f, foreground="#666", text="Catalog: %d icons, %d buff names." % (
+            row=3, column=0, sticky="w", pady=3)
+        ttk.Label(new, style="Muted.TLabel", text="Catalog: %d icons, %d buff names." % (
             len(self.catalog), len(self.catalog.all_names()))).grid(
-            row=len(rows) + 4, column=0, sticky="w", pady=4)
-        ttk.Button(f, text="Apply", command=self._settings_changed).grid(
-            row=len(rows) + 5, column=0, sticky="w", pady=8)
+            row=4, column=0, sticky="w", pady=(6, 2))
+        ttk.Button(f, text="Apply", style="Accent.TButton", command=self._settings_changed).grid(
+            row=2, column=0, sticky="w", pady=(14, 0))
 
     # ------------------------------------------------------------ auto-press tab
     def _build_autokey_tab(self):
-        f = ttk.Frame(self.nb, padding=8)
+        f = ttk.Frame(self.nb, padding=14)
         self.nb.add(f, text="Auto-press")
+        f.columnconfigure(0, weight=1)
         ak = self.settings["autokey"]
-        ttk.Label(f, wraplength=700, justify="left", text=(
+        ttk.Label(f, wraplength=760, justify="left", text=(
             "Give a buff a key (Buffs tab > Auto-press key...) and BuffWatch taps that key "
             "when the buff runs out, every few seconds, until the buff shows up again. It "
             "gives up after the set number of presses (out of energy, menu open...) and "
             "tries again only after it has seen the buff once more.")).grid(
-            row=0, column=0, columnspan=3, sticky="w")
-        ttk.Label(f, wraplength=700, justify="left", foreground="#9a4b00", text=(
+            row=0, column=0, sticky="w")
+        ttk.Label(f, wraplength=760, justify="left", style="Warn.TLabel", text=(
             "This sends simulated key presses to the game, like AutoHotkey does. That is "
             "automation, so Digital Extremes' rules on macros apply. Use it at your own "
             "risk. Nothing is pressed unless you assign a key to a buff.")).grid(
-            row=1, column=0, columnspan=3, sticky="w", pady=(6, 10))
+            row=1, column=0, sticky="w", pady=(8, 14))
+        box = ttk.LabelFrame(f, text="AUTO-PRESS", padding=(14, 8))
+        box.grid(row=2, column=0, sticky="ew")
         self.ak_enabled = tk.BooleanVar(value=ak["enabled"])
-        ttk.Checkbutton(f, text="Auto-press on", variable=self.ak_enabled,
-                        command=self._autokey_changed).grid(row=2, column=0, sticky="w")
+        ttk.Checkbutton(box, text="Auto-press on", variable=self.ak_enabled,
+                        command=self._autokey_changed).grid(row=0, column=0, sticky="w", pady=3)
         self.ak_focus = tk.BooleanVar(value=ak["only_when_focused"])
-        ttk.Checkbutton(f, text="Only press while the game window is focused (title contains "
-                                "the window title from the Capture box, default 'Warframe')",
+        ttk.Checkbutton(box, text="Only press while the game window is focused (title contains "
+                                  "the window title from the Capture box, default 'Warframe')",
                         variable=self.ak_focus, command=self._autokey_changed).grid(
-            row=3, column=0, columnspan=3, sticky="w", pady=2)
-        ttk.Label(f, text="On/off hotkey (works in game):").grid(row=4, column=0, sticky="w", pady=6)
-        self.ak_hotkey = KeyEntry(f, ak["toggle_hotkey"], on_change=self._hotkey_changed)
-        self.ak_hotkey.grid(row=4, column=1, sticky="w")
-        self.ak_hotkey_msg = ttk.Label(f, foreground="#666")
-        self.ak_hotkey_msg.grid(row=4, column=2, sticky="w", padx=8)
-        ttk.Label(f, text="Frames a buff may be unseen before pressing:").grid(
-            row=5, column=0, sticky="w", pady=2)
+            row=1, column=0, columnspan=3, sticky="w", pady=3)
+        ttk.Label(box, text="On/off hotkey (works in game):").grid(row=2, column=0, sticky="w", pady=8)
+        self.ak_hotkey = KeyEntry(box, ak["toggle_hotkey"], on_change=self._hotkey_changed)
+        self.ak_hotkey.grid(row=2, column=1, sticky="w")
+        self.ak_hotkey_msg = ttk.Label(box, style="Muted.TLabel")
+        self.ak_hotkey_msg.grid(row=2, column=2, sticky="w", padx=10)
+        ttk.Label(box, text="Frames a buff may be unseen before pressing:").grid(
+            row=3, column=0, sticky="w", pady=3)
         self.ak_miss = tk.IntVar(value=ak["miss_frames"])
-        ttk.Spinbox(f, from_=0, to=30, increment=1, textvariable=self.ak_miss, width=7,
-                    command=self._autokey_changed).grid(row=5, column=1, sticky="w")
-        ttk.Label(f, foreground="#666", text="0-1 = press right away, higher = ignore "
-                  "detection flicker").grid(row=5, column=2, sticky="w", padx=8)
+        ttk.Spinbox(box, from_=0, to=30, increment=1, textvariable=self.ak_miss, width=7,
+                    command=self._autokey_changed).grid(row=3, column=1, sticky="w")
+        ttk.Label(box, style="Muted.TLabel", text="0-1 = press right away, higher = ignore "
+                  "detection flicker").grid(row=3, column=2, sticky="w", padx=10)
 
     def _autokey_changed(self):
         ak = self.settings["autokey"]
@@ -881,7 +938,7 @@ class App:
         self.hotkey = keys.HotkeyListener(spec, self.hotkey_events)
         err = self.hotkey.start_and_wait()
         self.ak_hotkey_msg.configure(text=err or "press %s in game to switch auto-press on/off"
-                                     % spec.upper(), foreground="#b00020" if err else "#666")
+                                     % spec.upper(), foreground=th.RED if err else th.MUTED)
 
     def _settings_changed(self):
         s = self.settings
@@ -980,7 +1037,7 @@ class App:
             self._apply_catalog_events(recognised, learned)
         if res is not None:
             if res.error:
-                self.status.configure(text=res.error, foreground="#b00020")
+                self.status.configure(text=res.error, foreground=th.RED)
             else:
                 self.result = res
                 self.autokey_status = self.autokey.update(
@@ -998,11 +1055,11 @@ class App:
                     active_profile(self.settings)["min_energy"]) if res.skills else {}
                 flash = getattr(self, "_flash", None)
                 if flash and now < flash[1]:
-                    self.status.configure(text=flash[0], foreground="#0a7a20")
+                    self.status.configure(text=flash[0], foreground=th.GREEN)
                 else:
                     self.status.configure(
-                        text="%.1f scans/s - %d active" % (res.fps, len(res.present)),
-                        foreground="#666")
+                        text="%.1f scans/s  \u00b7  %d active" % (res.fps, len(res.present)),
+                        foreground=th.MUTED)
                 if new:
                     known = {u.uid for u in self.unknowns}
                     self.unknowns += [u for u in new if u.uid not in known]
