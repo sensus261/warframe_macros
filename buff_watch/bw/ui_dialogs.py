@@ -137,3 +137,83 @@ class BoxPicker(tk.Toplevel):
         self.on_done(self.roi[y0:y1, x0:x1].copy(), name or "(ignored)", kind,
                      self.pin.get() and kind == "buff")
         self.destroy()
+
+
+class CatalogPicker(tk.Toplevel):
+    """Search the buff catalog by name and add one to the library, before ever
+    seeing it in game."""
+
+    def __init__(self, master, catalog, on_done):
+        super().__init__(master)
+        self.title("BuffWatch - add from catalog")
+        self.on_done = on_done
+        self.all = catalog.all_names()
+        self.shown = self.all
+        top = ttk.Frame(self, padding=6)
+        top.pack(fill="x")
+        ttk.Label(top, text="Search:").pack(side="left")
+        self.query = tk.StringVar()
+        self.query.trace_add("write", lambda *a: self._filter())
+        ent = ttk.Entry(top, textvariable=self.query, width=40)
+        ent.pack(side="left", padx=4)
+
+        mid = ttk.Frame(self, padding=(6, 0))
+        mid.pack(fill="both", expand=True)
+        self.lb = tk.Listbox(mid, width=48, height=18, activestyle="none", exportselection=False)
+        sb = ttk.Scrollbar(mid, orient="vertical", command=self.lb.yview)
+        self.lb.configure(yscrollcommand=sb.set)
+        self.lb.pack(side="left", fill="both", expand=True)
+        sb.pack(side="left", fill="y")
+        self.lb.bind("<<ListboxSelect>>", lambda e: self._show())
+        self.lb.bind("<Double-1>", lambda e: self._ok(True))
+        side = ttk.Frame(mid, padding=(10, 0))
+        side.pack(side="left", fill="y")
+        self.preview = tk.Label(side, bg="black")
+        self.preview.pack(anchor="n")
+        self.info = ttk.Label(side, wraplength=220, justify="left")
+        self.info.pack(anchor="n", pady=6)
+
+        bar = ttk.Frame(self, padding=6)
+        bar.pack(fill="x")
+        ttk.Button(bar, text="Add + show in overlay", command=lambda: self._ok(True)).pack(side="right")
+        ttk.Button(bar, text="Add", command=lambda: self._ok(False)).pack(side="right", padx=4)
+        ttk.Button(bar, text="Cancel", command=self.destroy).pack(side="right")
+        self.bind("<Return>", lambda e: self._ok(True))
+        self.bind("<Escape>", lambda e: self.destroy())
+        self._filter()
+        ent.focus_force()
+
+    def _filter(self):
+        q = self.query.get().strip().lower()
+        self.shown = [x for x in self.all if q in x[0].lower()] if q else self.all
+        self.lb.delete(0, "end")
+        for name, _ in self.shown:
+            self.lb.insert("end", name)
+        if self.shown:
+            self.lb.selection_set(0)
+        self._show()
+
+    def _current(self):
+        sel = self.lb.curselection()
+        return self.shown[sel[0]] if sel else None
+
+    def _show(self):
+        cur = self._current()
+        if cur is None:
+            self.preview.configure(image="")
+            self.info.configure(text="")
+            return
+        name, icon = cur
+        self._photo = to_photo(icon.thumb(96))
+        self.preview.configure(image=self._photo)
+        n = len(icon.names)
+        self.info.configure(text=(
+            "This icon is shared by %d buffs. BuffWatch can only tell that one of them is "
+            "active, not which." % n) if n > 1 else "")
+
+    def _ok(self, pin):
+        cur = self._current()
+        if cur is None:
+            return
+        self.on_done(cur[0], cur[1], pin)
+        self.destroy()

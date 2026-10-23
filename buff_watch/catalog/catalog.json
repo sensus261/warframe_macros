@@ -1,0 +1,2164 @@
+[
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_Affinity.png",
+  "names": [
+   "Tenno Affinity"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_Affinity.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_AffinityRangeBuff.png",
+  "names": [
+   "FOSFOR: Affinity Range"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_AffinityRangeBuff.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_StealthCombo.png",
+  "names": [
+   "Stealth Kill Affinity Bonus"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_StealthCombo.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_TransferenceDisruption.png",
+  "names": [
+   "Transference Static"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_TransferenceDisruption.png"
+ },
+ {
+  "file": "_Lotus_Materials_Emblems_IndexIcon.png",
+  "names": [
+   "The Index: Financial Stress"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Materials_Emblems_IndexIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon01.png",
+  "names": [
+   "RISING BLAST: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon01.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon02.png",
+  "names": [
+   "FLAME BLAST: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon02.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon04.png",
+  "names": [
+   "VOID STRIKE: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon04.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon05.png",
+  "names": [
+   "VOID RADIANCE: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon05.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon06.png",
+  "names": [
+   "METEORIC DASH: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon06.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon08.png",
+  "names": [
+   "BLAZING DASH: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon08.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon10.png",
+  "names": [
+   "PHOENIX SPIRIT: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon10.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon12.png",
+  "names": [
+   "PHOENIX TALONS: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon12.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon13.png",
+  "names": [
+   "INNER GAZE: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon13.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon14.png",
+  "names": [
+   "ETERNAL GAZE: Madurai"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon14.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon15.png",
+  "names": [
+   "GUARDIAN BLAST: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon15.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon16.png",
+  "names": [
+   "GUARDIAN SHELL: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon16.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon17.png",
+  "names": [
+   "VOID REGEN: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon17.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon18.png",
+  "names": [
+   "VOID AEGIS: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon18.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon19.png",
+  "names": [
+   "PROTECTIVE DASH: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon19.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon21.png",
+  "names": [
+   "SONIC DASH: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon21.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon22.png",
+  "names": [
+   "MENDING SOUL: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon22.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon30.png",
+  "names": [
+   "MENDING UNITY: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon30.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon31.png",
+  "names": [
+   "ENDURING TIDES: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon31.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon33.png",
+  "names": [
+   "REJUVENATING TIDES: Vazarin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon33.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon34.png",
+  "names": [
+   "VOLTAIC BLAST: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon34.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon35.png",
+  "names": [
+   "TEMPORAL BLAST: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon35.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon36.png",
+  "names": [
+   "VOID SINGULARITY: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon36.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon37.png",
+  "names": [
+   "ENERGIZING DASH: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon37.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon38.png",
+  "names": [
+   "VOID STATIC: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon38.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon39.png",
+  "names": [
+   "LIGHTNING DASH: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon39.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon42.png",
+  "names": [
+   "INNER MIGHT: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon42.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon44.png",
+  "names": [
+   "ENERGY PULSE: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon44.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon46.png",
+  "names": [
+   "VOID FLOW: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon46.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon47.png",
+  "names": [
+   "VOID SIPHON: Zenurik"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon47.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon50.png",
+  "names": [
+   "DISORIENTING BLAST: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon50.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon52.png",
+  "names": [
+   "DISARMING BLAST: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon52.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon53.png",
+  "names": [
+   "VOID STALKER: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon53.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon55.png",
+  "names": [
+   "VOID HUNTER: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon55.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon57.png",
+  "names": [
+   "EXECUTING DASH: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon57.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon58.png",
+  "names": [
+   "SURGING DASH: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon58.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon59.png",
+  "names": [
+   "POWER SPIKE: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon59.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon60.png",
+  "names": [
+   "AFFINITY SPIKE: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon60.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon61.png",
+  "names": [
+   "MAGNETIC BLAST: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon61.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon62.png",
+  "names": [
+   "UNAIRU WISP: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon62.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon63.png",
+  "names": [
+   "MIND SPRINT: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon63.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon64.png",
+  "names": [
+   "MIND STEP: Naramon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon64.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon65.png",
+  "names": [
+   "VOID SHADOW: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon65.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon66.png",
+  "names": [
+   "VOID CHRYSALIS: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon66.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon67.png",
+  "names": [
+   "SUNDERING DASH: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon67.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon69.png",
+  "names": [
+   "CRIPPLING DASH: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon69.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon70.png",
+  "names": [
+   "STONE SKIN: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon70.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon73.png",
+  "names": [
+   "VOID SPINES: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon73.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon76.png",
+  "names": [
+   "BASILISK GAZE: Unairu",
+   "BASILISK SCALES: Unairu"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_FocusNodeIcons_FocusIcon76.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourAnchors.png",
+  "names": [
+   "AMESHA: Benevolent Decoy"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourAnchors.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourBlast.png",
+  "names": [
+   "AMESHA: Warding Grace"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourBlast.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourBounty.png",
+  "names": [
+   "AMESHA: Vengeful Rush"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourBounty.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourSecurity.png",
+  "names": [
+   "AMESHA: Watchful Swarm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingFourSecurity.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneChaff.png",
+  "names": [
+   "ODONATA: Disarray"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneChaff.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneEMPPush.png",
+  "names": [
+   "ODONATA: Repel"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneEMPPush.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneMissileVolley.png",
+  "names": [
+   "ODONATA: Seeking Fire"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneMissileVolley.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneShield.png",
+  "names": [
+   "ODONATA: Energy Shell",
+   "Augment: Energy Field"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingOneShield.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeBlink.png",
+  "names": [
+   "ITZAL: Blink"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeBlink.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeCloaking.png",
+  "names": [
+   "ITZAL: Penumbra"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeCloaking.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeDistractionDrones.png",
+  "names": [
+   "ITZAL: Fighter Escort"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeDistractionDrones.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeGravInstability.png",
+  "names": [
+   "ITZAL: Cosmic Crush",
+   "Augment: Cold Snap"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingThreeGravInstability.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoArtilleryBarrage.png",
+  "names": [
+   "ELYTRON: Thumper"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoArtilleryBarrage.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoBigBoy.png",
+  "names": [
+   "ELYTRON: Warhead"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoBigBoy.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoExhaustTrail.png",
+  "names": [
+   "ELYTRON: Core Vent",
+   "Augment: Afterburner"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoExhaustTrail.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoTNT.png",
+  "names": [
+   "ELYTRON: Bloomer"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Archwing_ArchwingTwoTNT.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_AtlasBarrier.png",
+  "names": [
+   "ATLAS: Tectonics",
+   "Augment: Tectonic Fracture"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_AtlasBarrier.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_AtlasRockPunch.png",
+  "names": [
+   "ATLAS: Landslide",
+   "Augment: Path of Statues"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_AtlasRockPunch.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_AtlasStoneGaze.png",
+  "names": [
+   "ATLAS: Petrify",
+   "Augment: Ore Gaze"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_AtlasStoneGaze.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_AtlasSummon.png",
+  "names": [
+   "ATLAS: Rumblers",
+   "Augment: Rumbled",
+   "Augment: Titanic Rumbler"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_AtlasSummon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BansheeSilence.png",
+  "names": [
+   "Augment: Savage Silence",
+   "BANSHEE: Silence"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BansheeSilence.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BansheeSonar.png",
+  "names": [
+   "Augment: Resonance",
+   "BANSHEE: Sonar"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BansheeSonar.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BansheeSonicBoom.png",
+  "names": [
+   "Augment: Sonic Fracture",
+   "BANSHEE: Sonic Boom"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BansheeSonicBoom.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BansheeSoundQuake.png",
+  "names": [
+   "Augment: Resonating Quake",
+   "BANSHEE: Sound Quake"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BansheeSoundQuake.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BardAmplifier.png",
+  "names": [
+   "OCTAVIA: Amp"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BardAmplifier.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BardMusicBox.png",
+  "names": [
+   "Augment: Partitioned Mallet",
+   "OCTAVIA: Mallet"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BardMusicBox.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BardPiedPiper.png",
+  "names": [
+   "Augment: Conductor",
+   "OCTAVIA: Resonator"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BardPiedPiper.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BardPumpJam.png",
+  "names": [
+   "OCTAVIA: Metronome"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BardPumpJam.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BaruukBulletDodger.png",
+  "names": [
+   "BARUUK: Elude"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BaruukBulletDodger.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BaruukCalmingWave.png",
+  "names": [
+   "BARUUK: Lull"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BaruukCalmingWave.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BaruukOrbitalDisarm.png",
+  "names": [
+   "BARUUK: Desolate Hands"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BaruukOrbitalDisarm.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BaruukOverTheEdge.png",
+  "names": [
+   "BARUUK: Serene Storm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BaruukOverTheEdge.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BerserkerGrapplingHook.png",
+  "names": [
+   "Augment: Swing Line",
+   "VALKYR: Rip Line"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BerserkerGrapplingHook.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BerserkerLastStand.png",
+  "names": [
+   "Augment: Hysterical Assault",
+   "Augment: Hysterical Fixation",
+   "VALKYR: Hysteria"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BerserkerLastStand.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BerserkerScream.png",
+  "names": [
+   "Augment: Eternal War",
+   "VALKYR: Warcry"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BerserkerScream.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_BerserkerShieldBash.png",
+  "names": [
+   "Augment: Prolonged Paralysis",
+   "VALKYR: Paralysis"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_BerserkerShieldBash.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_DragonDragonScales.png",
+  "names": [
+   "Augment: Vexing Retaliation",
+   "CHROMA: Vex Armor"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_DragonDragonScales.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_DragonScalesExtraArmour.png",
+  "names": [
+   "CHROMA: Vex Armor: Scorn"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_DragonScalesExtraArmour.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_DragonScalesExtraDamage.png",
+  "names": [
+   "CHROMA: Vex Armor: Fury"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_DragonScalesExtraDamage.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_DragonElementalAttack.png",
+  "names": [
+   "Augment: Afterburn",
+   "CHROMA: Spectral Scream"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_DragonElementalAttack.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_DragonLuckyDragon.png",
+  "names": [
+   "Augment: Everlasting Ward",
+   "CHROMA: Elemental Ward"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_DragonLuckyDragon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_DragonSentient.png",
+  "names": [
+   "Augment: Guided Effigy",
+   "CHROMA: Effigy"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_DragonSentient.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_EmberFireBall.png",
+  "names": [
+   "Augment: Fireball Frenzy",
+   "EMBER: Fireball"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_EmberFireBall.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_EmberFireBlast.png",
+  "names": [
+   "Augment: Fire Fright",
+   "Augment: Purifying Flames",
+   "EMBER: Fire Blast"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_EmberFireBlast.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_EmberOverHeat.png",
+  "names": [
+   "Augment: Flash Accelerant",
+   "EMBER: Accelerant"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_EmberOverHeat.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_EmberWorldOnFire.png",
+  "names": [
+   "Augment: Firequake",
+   "EMBER: World On Fire"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_EmberWorldOnFire.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_ExcaliburSwordOfDoom.png",
+  "names": [
+   "Augment: Chromatic Blade",
+   "EXCALIBUR: Exalted Blade"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_ExcaliburSwordOfDoom.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieDust.png",
+  "names": [
+   "TITANIA: Spellbind"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieDust.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieLamp.png",
+  "names": [
+   "Augment: Beguiling Lantern",
+   "TITANIA: Lantern"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieLamp.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieShrink.png",
+  "names": [
+   "Augment: Razorwing Blitz",
+   "TITANIA: Razorwing"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieShrink.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieSoul.png",
+  "names": [
+   "TITANIA: Tribute"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieSoul.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieSoulBuffWild.png",
+  "names": [
+   "TITANIA: Tribute: Full Moon"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieSoulBuffWild.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieSoulBuffDust.png",
+  "names": [
+   "TITANIA: Tribute: Dust"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieSoulBuffDust.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieSoulBuffThorns.png",
+  "names": [
+   "TITANIA: Tribute: Thorns"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieSoulBuffThorns.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FaerieSoulBuffVines.png",
+  "names": [
+   "TITANIA: Tribute: Entangle"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FaerieSoulBuffVines.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FrostAvalanche.png",
+  "names": [
+   "Augment: Icy Avalanche",
+   "FROST: Avalanche"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FrostAvalanche.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FrostFreeze.png",
+  "names": [
+   "Augment: Freeze Force",
+   "FROST: Freeze"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FrostFreeze.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FrostIceWave.png",
+  "names": [
+   "Augment: Ice Wave Impedance",
+   "FROST: Ice Wave"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FrostIceWave.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_FrostSnowGlobe.png",
+  "names": [
+   "Augment: Chilling Globe",
+   "FROST: Snow Globe"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_FrostSnowGlobe.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GarudaBloodSunder.png",
+  "names": [
+   "GARUDA: Bloodletting"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GarudaBloodSunder.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GarudaBoneZone.png",
+  "names": [
+   "GARUDA: Seeking Talons"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GarudaBoneZone.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GarudaMeatShield.png",
+  "names": [
+   "GARUDA: Dread Mirror"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GarudaMeatShield.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GarudaSanguineSiphon.png",
+  "names": [
+   "GARUDA: Blood Altar"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GarudaSanguineSiphon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_GarudaBuffIndicator.png",
+  "names": [
+   "GARUDA: Death's Gate"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_GarudaBuffIndicator.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GlassFragmentedReality.png",
+  "names": [
+   "Augment: Spectrosiphon",
+   "GARA: Spectrorage"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GlassFragmentedReality.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GlassRing.png",
+  "names": [
+   "GARA: Mass Vitrify"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GlassRing.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GlassShank.png",
+  "names": [
+   "GARA: Shattered Lash"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GlassShank.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GlassShatteredAura.png",
+  "names": [
+   "Augment: Mending Splinters",
+   "GARA: Splinter Storm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GlassShatteredAura.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GunslingerBallisticBattery.png",
+  "names": [
+   "Augment: Ballistic Bullseye",
+   "MESA: Ballistic Battery"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GunslingerBallisticBattery.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GunslingerGunFu.png",
+  "names": [
+   "Augment: Mesa's Waltz",
+   "MESA: Peacemaker"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GunslingerGunFu.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GunslingerRicochetArmour.png",
+  "names": [
+   "Augment: Staggering Shield",
+   "MESA: Shatter Shield"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GunslingerRicochetArmour.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_GunslingerRussianRoulette.png",
+  "names": [
+   "Augment: Muzzle Flash",
+   "MESA: Shooting Gallery"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_GunslingerRussianRoulette.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_HarlequinDeadlyTrap.png",
+  "names": [
+   "Augment: Explosive Legerdemain",
+   "MIRAGE: Sleight of Hand"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_HarlequinDeadlyTrap.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_HarlequinLightDark.png",
+  "names": [
+   "Augment: Total Eclipse",
+   "MIRAGE: Eclipse"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_HarlequinLightDark.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_HarlequinPrism.png",
+  "names": [
+   "Augment: Prism Guard",
+   "MIRAGE: Prism"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_HarlequinPrism.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_HarlequinReflection.png",
+  "names": [
+   "Augment: Hall of Malevolence",
+   "MIRAGE: Hall of Mirrors"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_HarlequinReflection.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_InfestedInfest.png",
+  "names": [
+   "Augment: Insatiable",
+   "NIDUS: Ravenous"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_InfestedInfest.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_InfestedRupture.png",
+  "names": [
+   "NIDUS: Virulence"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_InfestedRupture.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_InfestedSymboticLink.png",
+  "names": [
+   "NIDUS: Parasitic Link"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_InfestedSymboticLink.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_InfestedTendrils.png",
+  "names": [
+   "Augment: Larva Burst",
+   "NIDUS: Larva"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_InfestedTendrils.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_KhoraAllTiedUp.png",
+  "names": [
+   "KHORA: Ensnare"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_KhoraAllTiedUp.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_KhoraCrack.png",
+  "names": [
+   "Augment: Accumulating Whipclaw",
+   "KHORA: Whipclaw"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_KhoraCrack.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_KhoraStrangleDome.png",
+  "names": [
+   "KHORA: Strangledome"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_KhoraStrangleDome.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_KhoraSummon.png",
+  "names": [
+   "Augment: Venari Bodyguard",
+   "KHORA: Venari"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_KhoraSummon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LimboBanish.png",
+  "names": [
+   "Augment: Haven",
+   "LIMBO: Banish"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LimboBanish.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LimboRiftWalk.png",
+  "names": [
+   "LIMBO: Stasis"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LimboRiftWalk.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LimboTearInSpace.png",
+  "names": [
+   "Augment: Cataclysmic Continuum",
+   "LIMBO: Cataclysm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LimboTearInSpace.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LimboVolatile.png",
+  "names": [
+   "Augment: Rift Torrent",
+   "LIMBO: Rift Surge"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LimboVolatile.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LokiDecoy.png",
+  "names": [
+   "Augment: Deceptive Bond",
+   "Augment: Savior Decoy",
+   "LOKI: Decoy"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LokiDecoy.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LokiInvisibility.png",
+  "names": [
+   "Augment: Hushed Invisibility",
+   "LOKI: Invisibility"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LokiInvisibility.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LokiRadialDisarm.png",
+  "names": [
+   "Augment: Irradiating Disarm",
+   "LOKI: Radial Disarm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LokiRadialDisarm.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_LokiSwitchTeleport.png",
+  "names": [
+   "Augment: Safeguard Switch",
+   "LOKI: Switch Teleport"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_LokiSwitchTeleport.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MagCrush.png",
+  "names": [
+   "Augment: Fracturing Crush",
+   "MAG: Crush"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MagCrush.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MagMagnetize.png",
+  "names": [
+   "Augment: Magnetized Discharge",
+   "MAG: Magnetize"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MagMagnetize.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MagPull.png",
+  "names": [
+   "Augment: Greedy Pull",
+   "Augment: Sapping Reach",
+   "MAG: Pull"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MagPull.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MagShieldRenew.png",
+  "names": [
+   "Augment: Counter Pulse",
+   "Augment: Shield Overload",
+   "MAG: Polarize"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MagShieldRenew.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MonkeyCloud.png",
+  "names": [
+   "Augment: Enveloping Cloud",
+   "WUKONG: Cloud Walker"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MonkeyCloud.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MonkeyDeath.png",
+  "names": [
+   "WUKONG: Defy"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MonkeyDeath.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MonkeyPoke.png",
+  "names": [
+   "Augment: Iron Vault",
+   "WUKONG: Iron Jab"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MonkeyPoke.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_MonkeyStaff.png",
+  "names": [
+   "Augment: Primal Rage",
+   "WUKONG: Primal Fury"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_MonkeyStaff.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NecroCloneTheDead.png",
+  "names": [
+   "Augment: Shield of Shadows",
+   "NEKROS: Shadows of the Dead"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NecroCloneTheDead.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NecroSearchTheDead.png",
+  "names": [
+   "Augment: Despoil",
+   "NEKROS: Desecrate"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NecroSearchTheDead.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NecroSoulPunch.png",
+  "names": [
+   "Augment: Discharge Strike",
+   "Augment: Soul Survivor",
+   "NEKROS: Soul Punch"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NecroSoulPunch.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NecroTerrorTotem.png",
+  "names": [
+   "Augment: Creeping Terrify",
+   "NEKROS: Terrify"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NecroTerrorTotem.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NezhaRing.png",
+  "names": [
+   "Augment: Reaping Chakram",
+   "NEZHA: Blazing Chakram"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NezhaRing.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NezhaSash.png",
+  "names": [
+   "Augment: Safeguard",
+   "Augment: Ward Recovery",
+   "NEZHA: Warding Halo"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NezhaSash.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NezhaSpear.png",
+  "names": [
+   "NEZHA: Divine Spears"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NezhaSpear.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NezhaTrail.png",
+  "names": [
+   "Augment: Pyroclastic Flow",
+   "NEZHA: Fire Walker"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NezhaTrail.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NinjaSmokeScreen.png",
+  "names": [
+   "ASH: Smoke Screen",
+   "Augment: Smoke Shadow",
+   "Augment: Tear Gas"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NinjaSmokeScreen.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NinjaStar.png",
+  "names": [
+   "ASH: Shuriken",
+   "Augment: Seeking Shuriken"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NinjaStar.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NinjaStorm.png",
+  "names": [
+   "ASH: Blade Storm",
+   "Augment: Rising Storm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NinjaStorm.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NinjaTeleport.png",
+  "names": [
+   "ASH: Teleport",
+   "Augment: Fatal Teleport"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NinjaTeleport.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NovaAntimatterDrop.png",
+  "names": [
+   "Augment: Antimatter Absorb",
+   "Augment: Antimatter Mine",
+   "NOVA: Antimatter Drop"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NovaAntimatterDrop.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NovaMolecularPrime.png",
+  "names": [
+   "Augment: Molecular Fission",
+   "NOVA: Molecular Prime"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NovaMolecularPrime.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NovaNullStar.png",
+  "names": [
+   "Augment: Neutron Star",
+   "NOVA: Null Star"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NovaNullStar.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NovaWormHole.png",
+  "names": [
+   "Augment: Escape Velocity",
+   "NOVA: Worm Hole",
+   "NOVA: Worm Hole: (wormhole)"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NovaWormHole.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NyxAbsorb.png",
+  "names": [
+   "Augment: Assimilate",
+   "Augment: Singularity",
+   "NYX: Absorb"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NyxAbsorb.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NyxChaos.png",
+  "names": [
+   "Augment: Chaos Sphere",
+   "NYX: Chaos"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NyxChaos.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NyxMindControl.png",
+  "names": [
+   "Augment: Mind Freak",
+   "NYX: Mind Control"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NyxMindControl.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_NyxPsychicBolts.png",
+  "names": [
+   "Augment: Pacifying Bolts",
+   "NYX: Psychic Bolts"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_NyxPsychicBolts.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PaladinHallowedGround.png",
+  "names": [
+   "Augment: Hallowed Eruption",
+   "OBERON: Hallowed Ground"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PaladinHallowedGround.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PaladinReckoning.png",
+  "names": [
+   "Augment: Defiled Reckoning",
+   "Augment: Hallowed Reckoning",
+   "OBERON: Reckoning"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PaladinReckoning.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PaladinRenewal.png",
+  "names": [
+   "Augment: Phoenix Renewal",
+   "OBERON: Renewal"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PaladinRenewal.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PaladinSmite.png",
+  "names": [
+   "Augment: Smite Infusion",
+   "OBERON: Smite"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PaladinSmite.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PirateCannonBarage.png",
+  "names": [
+   "Augment: Corroding Barrage",
+   "HYDROID: Tempest Barrage"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PirateCannonBarage.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PirateKraken.png",
+  "names": [
+   "Augment: Pilfering Swarm",
+   "HYDROID: Tentacle Swarm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PirateKraken.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PirateLiquefy.png",
+  "names": [
+   "Augment: Curative Undertow",
+   "HYDROID: Undertow"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PirateLiquefy.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PirateTidalWave.png",
+  "names": [
+   "Augment: Tidal Impunity",
+   "HYDROID: Tidal Surge"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PirateTidalWave.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Power01.png",
+  "names": [
+   "Augment: Radiant Finish",
+   "Augment: Signal Flare",
+   "EXCALIBUR: Radial Blind"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Power01.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Power02.png",
+  "names": [
+   "NARAMON: TRANSFERENCE",
+   "NEKROS PRIME: Soul Punch: Sustenance"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Power02.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Power03.png",
+  "names": [
+   "Augment: Furious Javelin",
+   "EXCALIBUR: Radial Javelin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Power03.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_Power04.png",
+  "names": [
+   "Augment: Purging Slash",
+   "Augment: Surging Dash",
+   "EXCALIBUR: Slash Dash"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_Power04.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PriestCondemn.png",
+  "names": [
+   "HARROW: Condemn"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PriestCondemn.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PriestPact.png",
+  "names": [
+   "Augment: Lasting Covenant",
+   "HARROW: Covenant"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PriestPact.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PriestPactA.png",
+  "names": [
+   "HARROW: Covenant: COVENANT RETALIATION"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PriestPactA.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PriestPactB.png",
+  "names": [
+   "HARROW: Covenant: COVENANT"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PriestPactB.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PriestPenance.png",
+  "names": [
+   "HARROW: Penance"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PriestPenance.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_PriestRavage.png",
+  "names": [
+   "Augment: Warding Thurible",
+   "HARROW: Thurible"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_PriestRavage.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RangerAfterTouch.png",
+  "names": [
+   "Augment: Piercing Navigator",
+   "IVARA: Navigator"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RangerAfterTouch.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RangerExaltedBow.png",
+  "names": [
+   "Augment: Concentrated Arrow",
+   "IVARA: Artemis Bow"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RangerExaltedBow.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RangerSteal.png",
+  "names": [
+   "Augment: Infiltrate",
+   "IVARA: Prowl"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RangerSteal.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RangerVersatileQuiver.png",
+  "names": [
+   "Augment: Empowered Quiver",
+   "Augment: Power of Three",
+   "IVARA: Quiver"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RangerVersatileQuiver.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RevenantDanseMacabre.png",
+  "names": [
+   "REVENANT: Danse Macabre"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RevenantDanseMacabre.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RevenantEnthrall.png",
+  "names": [
+   "REVENANT: Enthrall"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RevenantEnthrall.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RevenantMesmerSkin.png",
+  "names": [
+   "REVENANT: Mesmer Skin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RevenantMesmerSkin.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RevenantReave.png",
+  "names": [
+   "REVENANT: Reave"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RevenantReave.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RhinoDash.png",
+  "names": [
+   "Augment: Ironclad Charge",
+   "RHINO: Rhino Charge"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RhinoDash.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RhinoIronSkin.png",
+  "names": [
+   "Augment: Iron Shrapnel",
+   "RHINO: Iron Skin"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RhinoIronSkin.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RhinoRadialBlast.png",
+  "names": [
+   "Augment: Piercing Roar",
+   "RHINO: Roar"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RhinoRadialBlast.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_RhinoStomp.png",
+  "names": [
+   "Augment: Reinforcing Stomp",
+   "RHINO: Rhino Stomp"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_RhinoStomp.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SandmanBlast.png",
+  "names": [
+   "Augment: Desiccation's Curse",
+   "INAROS: Desiccation"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SandmanBlast.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SandmanDevour.png",
+  "names": [
+   "INAROS: Devour"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SandmanDevour.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SandmanStorm.png",
+  "names": [
+   "Augment: Elemental Sandstorm",
+   "INAROS: Sandstorm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SandmanStorm.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SandmanSwarm.png",
+  "names": [
+   "Augment: Negation Swarm",
+   "INAROS: Scarab Swarm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SandmanSwarm.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SarynContagion.png",
+  "names": [
+   "Augment: Contagion Cloud",
+   "SARYN: Toxic Lash"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SarynContagion.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SarynMiasma.png",
+  "names": [
+   "SARYN: Miasma"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SarynMiasma.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SarynMoult.png",
+  "names": [
+   "Augment: Regenerative Molt",
+   "SARYN: Molt"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SarynMoult.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_SarynVenom.png",
+  "names": [
+   "Augment: Venom Dose",
+   "SARYN: Spores"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_SarynVenom.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TenguAirBurst.png",
+  "names": [
+   "ZEPHYR: Airburst"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TenguAirBurst.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TenguTailWind.png",
+  "names": [
+   "Augment: Target Fixation",
+   "ZEPHYR: Tail Wind"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TenguTailWind.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TenguTornado.png",
+  "names": [
+   "Augment: Funnel Clouds",
+   "ZEPHYR: Tornado"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TenguTornado.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TenguTurbulance.png",
+  "names": [
+   "Augment: Jet Stream",
+   "ZEPHYR: Turbulence"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TenguTurbulance.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TrinityBlessing.png",
+  "names": [
+   "TRINITY: Blessing"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TrinityBlessing.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TrinityEnergyVampire.png",
+  "names": [
+   "Augment: Vampire Leech",
+   "TRINITY: Energy Vampire"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TrinityEnergyVampire.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TrinityLink.png",
+  "names": [
+   "Augment: Abating Link",
+   "TRINITY: Link"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TrinityLink.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_TrinityWellOfLife.png",
+  "names": [
+   "Augment: Pool Of Life",
+   "TRINITY: Well Of Life"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_TrinityWellOfLife.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VaubanBounce.png",
+  "names": [
+   "VAUBAN: Minelayer"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VaubanBounce.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VaubanLevTrap.png",
+  "names": [
+   "Augment: Repelling Bastille",
+   "VAUBAN: Bastille"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VaubanLevTrap.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VaubanVortex.png",
+  "names": [
+   "Augment: Perpetual Vortex",
+   "VAUBAN: Vortex"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VaubanVortex.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VaubanZap.png",
+  "names": [
+   "Augment: Tesla Link",
+   "VAUBAN: Tesla"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VaubanZap.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VoltChainLightning.png",
+  "names": [
+   "Augment: Shock Trooper",
+   "VOLT: Shock"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VoltChainLightning.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VoltOverLoad.png",
+  "names": [
+   "Augment: Capacitance",
+   "VOLT: Discharge"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VoltOverLoad.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VoltShield.png",
+  "names": [
+   "Augment: Recharge Barrier",
+   "Augment: Transistor Shield",
+   "VOLT: Electric Shield"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VoltShield.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_VoltSuperSpeed.png",
+  "names": [
+   "Augment: Kinetic Collision",
+   "Augment: Shocking Speed",
+   "VOLT: Speed"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_VoltSuperSpeed.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_YinYangAuraEnemyDamage.png",
+  "names": [
+   "Augment: Peaceful Provocation",
+   "EQUINOX: Pacify & Provoke"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_YinYangAuraEnemyDamage.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_YinYangBlastHeal.png",
+  "names": [
+   "Augment: Energy Transfer",
+   "EQUINOX: Mend & Maim"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_YinYangBlastHeal.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_YinYangSwitch.png",
+  "names": [
+   "Augment: Duality",
+   "Augment: Push & Pull",
+   "EQUINOX: Metamorphosis"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_YinYangSwitch.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Abilities_YinYangTargetCalm.png",
+  "names": [
+   "Augment: Calm & Frenzy",
+   "EQUINOX: Rest & Rage"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Abilities_YinYangTargetCalm.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Categories_IconSentinel_256.png",
+  "names": [
+   "Mod: Energy Generator"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Categories_IconSentinel_256.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_GeneticLab_TemperamentCheshire.png",
+  "names": [
+   "Mod: Charm"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_GeneticLab_TemperamentCheshire.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_CritChanceModifier.png",
+  "names": [
+   "Mod: Blood Rush",
+   "Mod: Mischief",
+   "Set Bonus: SYNTH MOD SET: Secondary"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_CritChanceModifier.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_DjinnBuffIcon.png",
+  "names": [
+   "Mod: Reawaken"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_DjinnBuffIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_Empowered.png",
+  "names": [
+   "Mod: Energy Conversion",
+   "Mod: Narrow Barrel"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_Empowered.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_FireRateOnHeadshot.png",
+  "names": [
+   "Mod: Repeater Clip",
+   "Proc: DUAL TOXOCYST",
+   "Proc: LESION"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_FireRateOnHeadshot.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_HealthIcon.png",
+  "names": [
+   "Proc: HIRUDO"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_HealthIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_HealthRegen.png",
+  "names": [
+   "NIDUS: Ravenous: Ravenous"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_HealthRegen.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedAbilityStrength.png",
+  "names": [
+   "Mod: Growing Power"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedAbilityStrength.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedAccuracy.png",
+  "names": [
+   "Mod: Guided Ordnance",
+   "Mod: Targeting Subsystem"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedAccuracy.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedArmour.png",
+  "names": [
+   "OBERON PRIME: Renewal: Iron Renewal"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedArmour.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedComboDuration.png",
+  "names": [
+   "Mod: Body Count",
+   "Mod: Harkonar Scope"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedComboDuration.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedCritChance.png",
+  "names": [
+   "Mod: Argon Scope",
+   "Mod: Cat’s Eye",
+   "Mod: Hydraulic Crosshairs",
+   "Mod: Maiming Strike",
+   "Arcane: VIRTUOS SHADOW",
+   "Set Bonus: SYNTH MOD SET: Primary"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedCritChance.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedCritDamage.png",
+  "names": [
+   "Mod: Bladed Rounds",
+   "Mod: Sharpened Bullets",
+   "Mod: Tek Collateral",
+   "Arcane: VIRTUOS STRIKE",
+   "Proc: KNELL"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedCritDamage.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedDamage.png",
+  "names": [
+   "Mod: Deadly Efficiency",
+   "Arcane: VIRTUOS FURY",
+   "Mod: Vigorous Swap",
+   "OCTAVIA: Metronome: Forte"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedDamage.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedRange.png",
+  "names": [
+   "Mod: Spring-Loaded Blade",
+   "Proc: ARCA TITRON"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedRange.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedStatChance.png",
+  "names": [
+   "Mod: Catalyzer Link",
+   "Mod: Embedded Catalyzer",
+   "Mod: Empowered Blades",
+   "Mod: Flux Overdrive",
+   "Arcane: VIRTUOS GHOST",
+   "Proc: ARCA SCISCO"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedStatChance.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_InvulnerabilityBuffIcon.png",
+  "names": [
+   "Mod: Rolling Guard"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_InvulnerabilityBuffIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_MultiShotBuffIcon.png",
+  "names": [
+   "OCTAVIA: Metronome: Opera"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_MultiShotBuffIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_NextShotCritChance.png",
+  "names": [
+   "Mod: Laser Sight"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_NextShotCritChance.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_NextShotDamageBonus.png",
+  "names": [
+   "Mod: Shrapnel Shot"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_NextShotDamageBonus.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_NextShotProcChance.png",
+  "names": [
+   "Mod: Nano-Applicator"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_NextShotProcChance.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_Protected.png",
+  "names": [
+   "Mod: Health Conversion"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_Protected.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_RapidFire.png",
+  "names": [
+   "Mod: Pressurized Magazine",
+   "Mod: Spring-Loaded Chamber"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_RapidFire.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_SpeedIcon.png",
+  "names": [
+   "Mod: Dispatch Overdrive",
+   "OCTAVIA: Metronome: Vivace",
+   "KHORA: Venari: Passive"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_SpeedIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_StatChanceModifier.png",
+  "names": [
+   "Mod: Weeping Wounds"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_StatChanceModifier.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_StealthBuffIcon.png",
+  "names": [
+   "OCTAVIA: Metronome: Nocturne"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_StealthBuffIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Syndicates_FactionSigilAssassins.png",
+  "names": [
+   "Augment: Eroding Blight",
+   "Augment: Gleaming Blight",
+   "Augment: Stockpiled Blight",
+   "Augment: Toxic Blight"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Syndicates_FactionSigilAssassins.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Syndicates_FactionSigilBusiness.png",
+  "names": [
+   "Augment: Deadly Sequence",
+   "Augment: Sequence Burn",
+   "Augment: Toxic Sequence",
+   "Augment: Voltage Sequence"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Syndicates_FactionSigilBusiness.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Syndicates_FactionSigilChurch.png",
+  "names": [
+   "Augment: Bright Purity",
+   "Augment: Disarming Purity",
+   "Augment: Lasting Purity",
+   "Augment: Winds of Purity",
+   "Proc: SANCTI MAGISTAR"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Syndicates_FactionSigilChurch.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Syndicates_FactionSigilJudge.png",
+  "names": [
+   "Augment: Avenging Truth",
+   "Augment: Blade of Truth",
+   "Augment: Gilded Truth",
+   "Augment: Stinging Truth"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Syndicates_FactionSigilJudge.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Syndicates_FactionSigilOracle.png",
+  "names": [
+   "Augment: Entropy Burst",
+   "Augment: Entropy Detonation",
+   "Augment: Entropy Flight",
+   "Augment: Entropy Spike",
+   "Proc: SYNOID HELIOCOR"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Syndicates_FactionSigilOracle.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_Syndicates_FactionSigilRebels.png",
+  "names": [
+   "Augment: Justice Blades",
+   "Augment: Neutralizing Justice",
+   "Augment: Scattered Justice",
+   "Augment: Shattering Justice",
+   "Proc: VAYKOR SYDON"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_Syndicates_FactionSigilRebels.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_RadialDamageBuffNotification.png",
+  "names": [
+   "Telos Boltace: STORMPATH"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_RadialDamageBuffNotification.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_IncreasedAbilityDuration.png",
+  "names": [
+   "Telos Boltace: STORMPATH"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_IncreasedAbilityDuration.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_NextShotDamageMultiplier.png",
+  "names": [
+   "DAMAGE MULTIPLIER"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_NextShotDamageMultiplier.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_GenericCosmeticEnhancerIcon.png",
+  "names": [
+   "ARCANE ACCELERATION",
+   "ARCANE AEGIS",
+   "ARCANE AGILITY",
+   "ARCANE ARACHNE",
+   "ARCANE AVENGER",
+   "ARCANE AWAKENING",
+   "ARCANE BARRIER",
+   "ARCANE CONSEQUENCE",
+   "ARCANE DEFLECTION",
+   "ARCANE FURY",
+   "ARCANE GRACE",
+   "ARCANE GUARDIAN",
+   "ARCANE HEALING",
+   "ARCANE ICE",
+   "ARCANE MOMENTUM",
+   "ARCANE NULLIFIER",
+   "ARCANE PHANTASM",
+   "ARCANE PRECISION",
+   "ARCANE RAGE",
+   "ARCANE RESISTANCE",
+   "ARCANE STRIKE",
+   "ARCANE TEMPO",
+   "ARCANE ULTIMATUM",
+   "ARCANE VELOCITY",
+   "ARCANE VICTORY",
+   "ARCANE WARMTH",
+   "EXODIA BRAVE",
+   "EXODIA CONTAGION",
+   "EXODIA EPIDEMIC",
+   "EXODIA FORCE",
+   "EXODIA HUNT",
+   "EXODIA MIGHT",
+   "EXODIA TRIUMPH",
+   "EXODIA VALOR",
+   "MAGUS ACCELERANT",
+   "MAGUS ANOMALY",
+   "MAGUS DESTRUCT",
+   "MAGUS DRIVE",
+   "MAGUS ELEVATE",
+   "MAGUS FIREWALL",
+   "MAGUS GLITCH",
+   "MAGUS HUSK",
+   "MAGUS LOCKDOWN",
+   "MAGUS MELT",
+   "MAGUS NOURISH",
+   "MAGUS OVERLOAD",
+   "MAGUS REPAIR",
+   "MAGUS REVERT",
+   "MAGUS VIGOR",
+   "PAX BOLT",
+   "PAX CHARGE",
+   "PAX SEEKER",
+   "PAX SOAR",
+   "VIRTUOS FORGE",
+   "VIRTUOS SPIKE",
+   "VIRTUOS SURGE",
+   "VIRTUOS TROJAN"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_GenericCosmeticEnhancerIcon.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_ModBuffIndicators_Berserker.png",
+  "names": [
+   "Mod: Berserker",
+   "Mod: Brain Storm",
+   "Mod: Deft Tempo",
+   "Mod: Double Tap",
+   "Mod: Emergent Aftermath",
+   "Mod: Final Act",
+   "Mod: Final Tap",
+   "Mod: Gorgon Frenzy",
+   "Mod: Kill Switch",
+   "Mod: Mortal Conduct",
+   "Mod: Plan B",
+   "Mod: Relentless Assault",
+   "Mod: Secondary Wind",
+   "Mod: Skull Shots",
+   "Mod: Sudden Justice",
+   "Mod: Tactical Retreat",
+   "Mod: Triple Tap"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_ModBuffIndicators_Berserker.png"
+ },
+ {
+  "file": "_Lotus_Interface_Icons_LooseBallMarker.png",
+  "names": [
+   "IMPAIRED (-10% parkour velocity)"
+  ],
+  "source": "https://semlar.com/textures/_Lotus_Interface_Icons_LooseBallMarker.png"
+ }
+]

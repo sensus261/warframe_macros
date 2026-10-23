@@ -9,9 +9,10 @@ import cv2
 
 from . import config, winutil
 from .capture import CaptureError, ImageSource, ScreenSource, list_monitors
+from .catalog import Catalog
 from .library import KIND_BUFF, KIND_IGNORE, Library
 from .ui_common import context_crop, thumb, to_photo
-from .ui_dialogs import BoxPicker, RegionPicker
+from .ui_dialogs import BoxPicker, CatalogPicker, RegionPicker
 from .ui_overlay import Overlay
 from .worker import Worker
 
@@ -25,7 +26,8 @@ class App:
         self.settings = config.load_settings()
         self.library = Library()
         self.library.load()
-        self.worker = Worker(self.settings, self.library, image_path)
+        self.catalog = Catalog().load()
+        self.worker = Worker(self.settings, self.library, self.catalog, image_path)
         self.result = None
         self.unknowns = []
         self.unknown_idx = 0
@@ -141,7 +143,8 @@ class App:
 
         bar = ttk.Frame(f)
         bar.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(6, 0))
-        for text, cmd in (("Show / hide in overlay", self.toggle_pin),
+        for text, cmd in (("Add from catalog...", self.add_from_catalog),
+                          ("Show / hide in overlay", self.toggle_pin),
                           ("Rename", self.rename), ("Threshold...", self.set_threshold),
                           ("Warn when missing", self.toggle_alert),
                           ("Coloured icon", self.toggle_mode),
@@ -202,6 +205,20 @@ class App:
             self.tree.item(e.id, values=self._row_values(e, present, score),
                            tags=("on",) if present else (
                                ("ignored",) if e.kind == KIND_IGNORE else ()))
+
+    def add_from_catalog(self):
+        if not len(self.catalog):
+            messagebox.showinfo("BuffWatch", "The catalog folder is missing.", parent=self.root)
+            return
+        cap_h = self.result.capture_h if self.result is not None else 1080
+        size = self.catalog.icon_size(self.settings, cap_h)
+
+        def done(name, icon, pin):
+            self.library.add(name, icon.render(size), KIND_BUFF, pinned=pin,
+                             catalog=icon.file, learned=False)
+            self.refresh_tree()
+
+        CatalogPicker(self.root, self.catalog, done)
 
     def toggle_pin(self):
         for e in self._selected():
@@ -267,32 +284,36 @@ class App:
         self.unk_title = ttk.Label(f, text="No new icons.", font=("Segoe UI", 11, "bold"))
         self.unk_title.grid(row=0, column=0, columnspan=3, sticky="w")
         self.unk_img = ttk.Label(f)
-        self.unk_img.grid(row=1, column=0, rowspan=4, padx=(0, 12), pady=6)
+        self.unk_img.grid(row=1, column=0, rowspan=5, padx=(0, 12), pady=6, sticky="n")
         self.unk_ctx = ttk.Label(f)
-        self.unk_ctx.grid(row=5, column=0, columnspan=3, sticky="w")
-        ttk.Label(f, text="What is it?").grid(row=1, column=1, sticky="w")
+        self.unk_ctx.grid(row=6, column=0, columnspan=3, sticky="w")
+        self.unk_sugg_label = ttk.Label(f, text="")
+        self.unk_sugg_label.grid(row=1, column=1, columnspan=2, sticky="w")
+        self.unk_sugg = ttk.Frame(f)
+        self.unk_sugg.grid(row=2, column=1, columnspan=2, sticky="w", pady=(2, 6))
+        ttk.Label(f, text="What is it?").grid(row=3, column=1, sticky="w")
         self.unk_name = tk.StringVar()
-        self.unk_entry = ttk.Entry(f, textvariable=self.unk_name, width=30)
-        self.unk_entry.grid(row=1, column=2, sticky="w")
+        self.unk_entry = ttk.Combobox(f, textvariable=self.unk_name, width=40)
+        self.unk_entry.grid(row=3, column=2, sticky="w")
         self.unk_entry.bind("<Return>", lambda e: self.unknown_save(True))
+        self.unk_choice = None  # catalog Icon picked from the suggestions
         b = ttk.Frame(f)
-        b.grid(row=2, column=1, columnspan=2, sticky="w", pady=4)
+        b.grid(row=4, column=1, columnspan=2, sticky="w", pady=4)
         ttk.Button(b, text="Save + show in overlay",
                    command=lambda: self.unknown_save(True)).pack(side="left", padx=2)
         ttk.Button(b, text="Save", command=lambda: self.unknown_save(False)).pack(side="left", padx=2)
         ttk.Button(b, text="Fix the box...", command=self.unknown_adjust).pack(side="left", padx=2)
-        b2 = ttk.Frame(f)
-        b2.grid(row=3, column=1, columnspan=2, sticky="w")
-        ttk.Button(b2, text="Not a buff (ignore forever)",
+        ttk.Button(b, text="Not a buff (ignore forever)",
                    command=self.unknown_ignore).pack(side="left", padx=2)
-        ttk.Button(b2, text="Skip for now", command=self.unknown_skip).pack(side="left", padx=2)
-        ttk.Button(b2, text="< Prev", command=lambda: self.unknown_step(-1)).pack(side="left", padx=(16, 2))
+        ttk.Button(b, text="Skip for now", command=self.unknown_skip).pack(side="left", padx=2)
+        b2 = ttk.Frame(f)
+        b2.grid(row=5, column=1, columnspan=2, sticky="nw")
+        ttk.Button(b2, text="< Prev", command=lambda: self.unknown_step(-1)).pack(side="left", padx=2)
         ttk.Button(b2, text="Next >", command=lambda: self.unknown_step(1)).pack(side="left", padx=2)
-        ttk.Label(f, foreground="#666", wraplength=520, justify="left", text=(
-            "Icons that BuffWatch sees but does not know yet show up here. Auto-detection "
-            "is a best guess: if the box cuts the icon or grabs the number under it, use "
-            "'Fix the box...'. If nothing gets detected, use 'Teach icon...' at the top.")
-        ).grid(row=4, column=1, columnspan=2, sticky="w", pady=6)
+        ttk.Label(b2, foreground="#666", wraplength=440, justify="left", text=(
+            "Pick the matching icon from the catalog suggestions, or type a name. If the "
+            "box cuts the icon or grabs the number under it, use 'Fix the box...'. If "
+            "nothing gets detected, use 'Teach icon...' at the top.")).pack(side="left", padx=12)
 
     def _current_unknown(self):
         if not self.unknowns:
@@ -304,11 +325,18 @@ class App:
         n = len(self.unknowns)
         self.nb.tab(self.unknown_tab, text="New icons (%d)" % n if n else "New icons")
         self.root.title("BuffWatch - %d new icon%s" % (n, "" if n == 1 else "s") if n else "BuffWatch")
+        for w in self.unk_sugg.winfo_children():
+            w.destroy()
+        self._sugg_photos = []
+        self.unk_choice = None
+        self.unk_entry["values"] = ()
+        self.unk_name.set("")
         u = self._current_unknown()
         if u is None:
             self.unk_title.configure(text="No new icons.")
             self.unk_img.configure(image="")
             self.unk_ctx.configure(image="")
+            self.unk_sugg_label.configure(text="")
             return
         self.unk_title.configure(text="New icon %d of %d" % (self.unknown_idx + 1, n))
         x, y, w, h = u.box
@@ -319,7 +347,39 @@ class App:
         s = min(2.0, PREVIEW_W / ctx.shape[1])
         self._unk_ctx_photo = to_photo(ctx, s, cv2.INTER_LINEAR)
         self.unk_ctx.configure(image=self._unk_ctx_photo)
-        self.unk_name.set("")
+
+        sugg = [m for m in u.suggestions if m.score >= 0.5][:4]
+        if not len(self.catalog):
+            self.unk_sugg_label.configure(text="")
+        elif not sugg:
+            self.unk_sugg_label.configure(
+                text="Not in the catalog - probably a newer buff. Type a name.")
+        else:
+            self.unk_sugg_label.configure(text="Looks like (best match first):")
+            for m in sugg:
+                photo = to_photo(m.icon.thumb(40))
+                self._sugg_photos.append(photo)
+                ttk.Button(self.unk_sugg, image=photo, compound="left",
+                           text="%s\n%d%% match" % (m.icon.label[:40], round(m.score * 100)),
+                           command=lambda ic=m.icon: self._pick_suggestion(ic)).pack(
+                    side="left", padx=2)
+            # Prefer a buff the user already added from the catalog but hasn't seen yet.
+            waiting = [m for m in sugg if any(not e.learned for e in
+                                             self.library.find_catalog(m.icon.file))]
+            if waiting:
+                self._pick_suggestion(waiting[0].icon)
+            elif sugg[0].score >= 0.6:
+                self._pick_suggestion(sugg[0].icon)
+
+    def _pick_suggestion(self, icon):
+        self.unk_choice = icon
+        self.unk_entry["values"] = icon.names
+        added = [e.name for e in self.library.find_catalog(icon.file) if not e.learned]
+        self.unk_name.set(added[0] if added else icon.names[0])
+        if len(icon.names) > 1:
+            self.unk_sugg_label.configure(
+                text="%d buffs share this icon - pick yours from the name list:" % len(icon.names))
+        self.unk_entry.focus_set()
 
     def unknown_step(self, d):
         self.unknown_idx += d
@@ -338,7 +398,16 @@ class App:
         if not name:
             self.unk_entry.focus_set()
             return
-        self.library.add(name, u.crop, KIND_BUFF, pinned=pin)
+        icon = self.unk_choice
+        waiting = [e for e in self.library.find_catalog(icon.file)
+                   if not e.learned and e.name == name] if icon else []
+        if waiting:  # added from the catalog earlier: now we know how it really looks
+            self.library.set_image(waiting[0].id, u.crop)
+            if pin:
+                self.library.update(waiting[0].id, pinned=True)
+        else:
+            self.library.add(name, u.crop, KIND_BUFF, pinned=pin,
+                             catalog=icon.file if icon and name in icon.names else None)
         self._drop_unknown(u)
         self.refresh_tree()
 
@@ -438,8 +507,20 @@ class App:
         self.prev_var = tk.BooleanVar(value=s["preview"])
         ttk.Checkbutton(f, text="Live preview in this window", variable=self.prev_var,
                         command=self._settings_changed).grid(row=len(rows) + 1, column=0, sticky="w")
+        self.auto_var = tk.BooleanVar(value=s["catalog_auto_name"])
+        ttk.Checkbutton(f, text="Name new icons by myself when the catalog match is certain",
+                        variable=self.auto_var, command=self._settings_changed).grid(
+            row=len(rows) + 2, column=0, sticky="w", pady=(4, 0))
+        self.only_var = tk.BooleanVar(value=s["catalog_only"])
+        ttk.Checkbutton(f, text="Only ask about icons that are in the catalog "
+                                "(hides newer buffs the catalog doesn't have)",
+                        variable=self.only_var, command=self._settings_changed).grid(
+            row=len(rows) + 3, column=0, sticky="w")
+        ttk.Label(f, foreground="#666", text="Catalog: %d icons, %d buff names." % (
+            len(self.catalog), len(self.catalog.all_names()))).grid(
+            row=len(rows) + 4, column=0, sticky="w", pady=4)
         ttk.Button(f, text="Apply", command=self._settings_changed).grid(
-            row=len(rows) + 2, column=0, sticky="w", pady=8)
+            row=len(rows) + 5, column=0, sticky="w", pady=8)
 
     def _settings_changed(self):
         s = self.settings
@@ -451,6 +532,8 @@ class App:
             s[k] = round(val, 2) if k == "match_threshold" else int(val)
         s["discovery"] = bool(self.disc_var.get())
         s["preview"] = bool(self.prev_var.get())
+        s["catalog_auto_name"] = bool(self.auto_var.get())
+        s["catalog_only"] = bool(self.only_var.get())
         self.library.touch()
         self.save_settings()
 
@@ -504,23 +587,33 @@ class App:
     # ================================================================ loop
     def _poll(self):
         res = None
+        new, recognised, learned = [], [], []
         try:
             while True:
                 res = self.worker.results.get_nowait()
+                new += res.new_unknowns
+                recognised += res.recognised
+                learned += res.learned
         except queue.Empty:
             pass
         now = time.monotonic()
+        if recognised or learned:
+            self._apply_catalog_events(recognised, learned)
         if res is not None:
             if res.error:
                 self.status.configure(text=res.error, foreground="#b00020")
             else:
                 self.result = res
-                self.status.configure(
-                    text="%.1f scans/s - %d active" % (res.fps, len(res.present)),
-                    foreground="#666")
-                if res.new_unknowns:
+                flash = getattr(self, "_flash", None)
+                if flash and now < flash[1]:
+                    self.status.configure(text=flash[0], foreground="#0a7a20")
+                else:
+                    self.status.configure(
+                        text="%.1f scans/s - %d active" % (res.fps, len(res.present)),
+                        foreground="#666")
+                if new:
                     known = {u.uid for u in self.unknowns}
-                    self.unknowns += [u for u in res.new_unknowns if u.uid not in known]
+                    self.unknowns += [u for u in new if u.uid not in known]
                     self.show_unknown()
                 if self.settings["preview"] and now - self._last_preview > 0.12:
                     self._last_preview = now
@@ -530,6 +623,24 @@ class App:
                     self._update_tree_status()
         self.overlay.show(self.result, len(self.unknowns), now)
         self.root.after(40, self._poll)
+
+    def _apply_catalog_events(self, recognised, learned):
+        names = []
+        for u in recognised:
+            m = u.suggestions[0]
+            if not self.library.find_catalog(m.icon.file):
+                self.library.add(m.icon.names[0], u.crop, KIND_BUFF, catalog=m.icon.file)
+                names.append(m.icon.names[0])
+            self.worker.resolve_unknown(u.uid)
+        for entry_id, crop in learned:
+            self.library.set_image(entry_id, crop)
+        if names:
+            self.flash_status("Recognised: " + ", ".join(names))
+        self.save_settings()  # the detector may have learned the icon size
+        self.refresh_tree()
+
+    def flash_status(self, text):
+        self._flash = (text, time.monotonic() + 6)
 
     def _draw_preview(self, res):
         if self.root.state() == "iconic":

@@ -15,6 +15,8 @@ class Result:
         self.capture_h = 0
         self.detections = []
         self.new_unknowns = []
+        self.recognised = []  # Unknowns the catalog named by itself
+        self.learned = []  # (entry_id, crop) for catalog buffs first seen on screen
         self.present = {}  # entry_id -> Detection (latest box) for buffs currently up
         self.scores = {}  # entry_id -> best score this frame
         self.error = None
@@ -22,12 +24,13 @@ class Result:
 
 
 class Worker(threading.Thread):
-    def __init__(self, settings, library, image_path=None):
+    def __init__(self, settings, library, catalog=None, image_path=None):
         super().__init__(daemon=True)
         self.settings = settings
         self.library = library
         self.image_path = image_path
         self.detector = Detector(settings)
+        self.detector.catalog = catalog
         self.lock = threading.Lock()  # guards self.detector
         self.results = queue.Queue(maxsize=2)
         self.running = threading.Event()
@@ -50,7 +53,11 @@ class Worker(threading.Thread):
             self.results.put_nowait(res)
         except queue.Full:
             try:
-                self.results.get_nowait()
+                old = self.results.get_nowait()
+                # Keep the one-off events of the frame we drop.
+                res.new_unknowns = old.new_unknowns + res.new_unknowns
+                res.recognised = old.recognised + res.recognised
+                res.learned = old.learned + res.learned
             except queue.Empty:
                 pass
             self.results.put_nowait(res)
@@ -80,6 +87,8 @@ class Worker(threading.Thread):
                 with self.lock:
                     self.detector.sync_library(entries, version)
                     dets, new = self.detector.process(roi, cap_h)
+                    res.recognised, self.detector.recognised = self.detector.recognised, []
+                    res.learned, self.detector.learned = self.detector.learned, []
                     for e in entries:
                         if self.detector.is_present(e.id):
                             res.present[e.id] = self.detector.last_det[e.id]

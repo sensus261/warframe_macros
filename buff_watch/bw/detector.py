@@ -76,6 +76,7 @@ class Unknown:
         Unknown._next += 1
         self.box = box
         self.frame = frame
+        self.suggestions = []  # catalog.Match list, best first
 
     @property
     def crop(self):
@@ -93,6 +94,10 @@ class Detector:
         self.last_seen = {}  # entry_id -> frame number
         self.last_det = {}  # entry_id -> Detection
         self.pending = []  # Unknowns waiting for the user
+        self.catalog = None  # optional catalog.Catalog used to name new icons
+        self.recognised = []  # Unknowns the catalog named confidently (drained by the worker)
+        self.learned = []  # (entry_id, screen crop) for catalog entries seen on screen
+        self._learning = set()
 
     # ------------------------------------------------------------ templates
     def sync_library(self, entries, version):
@@ -112,7 +117,8 @@ class Detector:
                 if f.shape[0] >= 4 and f.shape[1] >= 4 and f.std() > 2:
                     variants.append((f, f.shape[1], f.shape[0]))
             if variants:
-                tpls.append((e.id, e.kind, e.threshold, e.mode, variants))
+                learnable = bool(getattr(e, "catalog", None)) and not getattr(e, "learned", True)
+                tpls.append((e.id, e.kind, e.threshold, e.mode, variants, learnable))
         self._templates = tpls
         # Drop pending unknowns that are now known or ignored.
         self.pending = [u for u in self.pending if not self._is_known(u.crop)]
@@ -121,7 +127,7 @@ class Detector:
         if crop.size == 0:
             return True
         feats = {}
-        for _, _, thr, mode, variants in self._templates:
+        for _, _, thr, mode, variants, _ in self._templates:
             if mode not in feats:
                 feats[mode] = cv2.copyMakeBorder(feature(crop, mode), 6, 6, 6, 6,
                                                  cv2.BORDER_CONSTANT, value=0)
@@ -142,7 +148,10 @@ class Detector:
         feats = {"white": white_map(roi)}
         dets = []
         g_thr = self.settings["match_threshold"]
-        for entry_id, kind, thr, mode, variants in self._templates:
+        learnable = set()
+        for entry_id, kind, thr, mode, variants, learn in self._templates:
+            if learn:
+                learnable.add(entry_id)
             if mode not in feats:
                 feats[mode] = feature(roi, mode)
             f = feats[mode]
@@ -168,6 +177,13 @@ class Detector:
                         or d.score > prev.score):
                     self.last_det[d.entry_id] = d
                 self.last_seen[d.entry_id] = self._frame_no
+                # A buff added from the catalog starts with the catalog artwork; the first
+                # clear sighting replaces it with how the icon really looks on this screen.
+                if (d.entry_id in learnable and d.entry_id not in self._learning
+                        and d.score >= g_thr + 0.05):
+                    x, y, w, h = d.box
+                    self._learning.add(d.entry_id)
+                    self.learned.append((d.entry_id, roi[y:y + h, x:x + w].copy()))
 
         new = []
         if self.settings.get("discovery", True):
@@ -230,10 +246,34 @@ class Detector:
             u = Unknown(t["box"], roi.copy())
             if self._is_known(u.crop) or self._is_pending(u.crop):
                 continue
+            if self.catalog is not None and len(self.catalog):
+                if not self._identify(u, capture_h):
+                    continue
+                if self._is_known(u.crop) or self._is_pending(u.crop):
+                    continue
             if len(self.pending) < 50:
                 self.pending.append(u)
                 new.append(u)
         return new
+
+    def _identify(self, u, capture_h):
+        """Look the unknown up in the catalog. Returns False if it should be dropped
+        (it was named automatically, or catalog-only mode found nothing)."""
+        s = self.settings
+        u.suggestions = self.catalog.identify(u.frame, u.box, self.catalog.sizes(s, capture_h))
+        best = u.suggestions[0] if u.suggestions else None
+        second = u.suggestions[1].score if len(u.suggestions) > 1 else 0.0
+        if best is not None and best.score >= 0.6:
+            u.box = best.box  # the catalog knows the symbol's exact outline
+        if (best is not None and best.score >= s["catalog_auto_threshold"]
+                and best.score - second >= 0.08):
+            s["icon_frac"] = round(best.size / capture_h, 5)
+            if s["catalog_auto_name"] and len(best.icon.names) == 1:
+                self.recognised.append(u)
+                return False
+        if s["catalog_only"] and (best is None or best.score < 0.5):
+            return False
+        return True
 
     def _is_pending(self, crop):
         f = cv2.copyMakeBorder(white_map(crop), 6, 6, 6, 6, cv2.BORDER_CONSTANT, value=0)

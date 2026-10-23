@@ -15,7 +15,7 @@ KIND_IGNORE = "ignore"
 
 class Entry:
     def __init__(self, id, name, kind=KIND_BUFF, pinned=False, threshold=None,
-                 mode="white", alert_missing=False):
+                 mode="white", alert_missing=False, catalog=None, learned=True):
         self.id = id
         self.name = name
         self.kind = kind
@@ -23,6 +23,8 @@ class Entry:
         self.threshold = threshold  # None = use the global threshold
         self.mode = mode  # "white" for normal white icons, "gray" for coloured icons
         self.alert_missing = alert_missing  # highlight in red while a pinned buff is missing
+        self.catalog = catalog  # catalog icon file this entry came from, if any
+        self.learned = learned  # False while the image is still the catalog artwork
         self.image = None  # BGR numpy array
 
     @property
@@ -33,7 +35,8 @@ class Entry:
         return {
             "id": self.id, "name": self.name, "kind": self.kind, "pinned": self.pinned,
             "threshold": self.threshold, "mode": self.mode,
-            "alert_missing": self.alert_missing,
+            "alert_missing": self.alert_missing, "catalog": self.catalog,
+            "learned": self.learned,
         }
 
 
@@ -68,10 +71,11 @@ class Library:
                 json.dump([e.to_json() for e in self.entries], f, indent=2)
             os.replace(tmp, config.LIBRARY_FILE)
 
-    def add(self, name, image, kind=KIND_BUFF, pinned=False):
+    def add(self, name, image, kind=KIND_BUFF, pinned=False, catalog=None, learned=True):
         os.makedirs(config.ICON_DIR, exist_ok=True)
         with self.lock:
-            e = Entry(uuid.uuid4().hex[:12], name, kind=kind, pinned=pinned)
+            e = Entry(uuid.uuid4().hex[:12], name, kind=kind, pinned=pinned,
+                      catalog=catalog, learned=learned)
             e.image = image.copy()
             if not cv2.imwrite(e.icon_path, e.image):
                 raise OSError("could not write " + e.icon_path)
@@ -79,6 +83,22 @@ class Library:
             self.version += 1
             self.save()
             return e
+
+    def set_image(self, entry_id, image):
+        """Replace the catalog artwork with how the icon really looks on screen."""
+        with self.lock:
+            e = self.get(entry_id)
+            if e is None or image.size == 0:
+                return
+            e.image = image.copy()
+            e.learned = True
+            cv2.imwrite(e.icon_path, e.image)
+            self.version += 1
+            self.save()
+
+    def find_catalog(self, file):
+        with self.lock:
+            return [e for e in self.entries if e.catalog == file]
 
     def remove(self, entry_id):
         with self.lock:

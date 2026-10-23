@@ -34,6 +34,11 @@ DEFAULTS = {
     "icon_max_frac": 0.040,
     "stable_frames": 12,  # an unknown must sit still this many frames before it is reported
     "preview": True,
+    # Catalog (catalog/catalog.json, imported from semlar.com/buffs).
+    "catalog_auto_name": True,  # name a new icon by itself when the match is certain
+    "catalog_auto_threshold": 0.72,
+    "catalog_only": False,  # drop new icons that look like nothing in the catalog
+    "icon_frac": None,  # on-screen icon size / capture height, learned automatically
     # Overlay window.
     "overlay": {
         "visible": True,

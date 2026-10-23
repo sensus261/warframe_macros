@@ -6,7 +6,7 @@ if errorlevel 1 goto fail
 echo Installing PyInstaller...
 .venv\Scripts\python.exe -m pip install pyinstaller
 if errorlevel 1 goto fail
-.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --windowed --hidden-import PIL._tkinter_finder --name BuffWatch buffwatch.pyw
+.venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --windowed --hidden-import PIL._tkinter_finder --add-data "catalog;catalog" --name BuffWatch buffwatch.pyw
 if errorlevel 1 goto fail
 if not exist dist\BuffWatch\BuffWatch.exe goto fail
 echo.

@@ -10,9 +10,16 @@ corner of the screen, recognises the icons you taught it, and shows the ones you
 - **"Off" state.** A pinned buff that isn't active stays in the overlay, dimmed. Tick
   *Warn when missing* and its name turns red with a red border, so a buff that runs out is
   easy to spot. The border also flashes yellow briefly when a buff turns on or off.
-- **New icons are queued for you.** When an icon shows up that BuffWatch doesn't know, the
-  overlay shows a red "N new icons" badge. Open the *New icons* tab and either name the icon
-  or mark it "not a buff".
+- **Built-in catalog of ~270 buff icons** (from [semlar.com/buffs](https://semlar.com/buffs)).
+  When a new icon shows up, BuffWatch looks it up in the catalog:
+  - **Certain match:** it's named automatically, for example "Recognised: Mod: Growing
+    Power" in the status bar.
+  - **Possible matches:** the *New icons* tab shows the top candidates as one-click buttons.
+  - **No match:** you type a name, or mark it "not a buff". The catalog is from around 2020,
+    so newer arcanes and Incarnon/Citrine-era buffs often aren't in it.
+- **Add buffs before you see them.** *Buffs → Add from catalog...* lets you search by name
+  and pin a buff right away. The first time it appears in game, BuffWatch confirms it and
+  switches to how the icon really looks on your screen.
 - **You choose what to magnify.** On the *Buffs* tab, double-click rows (or select several
   and press *Show / hide in overlay*) to choose which buffs appear big in the overlay.
 
@@ -51,7 +58,9 @@ other windows on top of exclusive fullscreen, and capturing it may give a black 
    than you need on the left, because the list grows leftwards as more buffs stack up. Stop
    it before the health/shield numbers. You only need to do this again if you change
    resolution or HUD scale.
-3. **Teach icons.** Two ways:
+3. **Teach icons.** Most common buffs get named by themselves once they appear. For the
+   rest, or to pin buffs ahead of time, *Add from catalog...* on the Buffs tab is quickest.
+   Other ways:
    - Wait. Icons that stay still for a moment show up in **New icons**. Type a name and
      click *Save + show in overlay*. If the box cuts off the icon or includes the number,
      click *Fix the box...* first. For things that aren't buffs, click
@@ -70,6 +79,9 @@ up or share them, copy that folder.
 - **Detection tab: Default match threshold** (0.70). Raise it if one buff gets mistaken
   for a similar-looking one. Lower it if a buff isn't found. You can also set a threshold
   per buff on the *Buffs* tab.
+- **Detection tab, catalog options.** *Name new icons by myself* turns the automatic naming
+  on or off. *Only ask about icons that are in the catalog* stops BuffWatch asking about
+  anything the catalog doesn't know. That cuts false alarms, but it also hides newer buffs.
 - **Coloured icon** (Buffs tab). Matching normally looks only at white/grey pixels so the
   scenery behind the HUD doesn't interfere. Turn this on for an icon that isn't white.
 - **Frames a buff may be unseen before it counts as off.** Stops the overlay flickering
@@ -89,6 +101,11 @@ This uses a screenshot (or a folder of screenshots) instead of the screen. It's 
 teaching icons from screenshots you took earlier (F6 in Warframe).
 
 ## Limitations
+
+- **Shared icons.** Many buffs share one icon. For example, one generic icon is used by
+  ~57 arcanes and another by ~17 mods (Berserker, Gorgon Frenzy...). BuffWatch can tell that
+  "one of them" is active, but not which. When you name one, pick the buff you actually use
+  from the drop-down list.
 
 - Icons are matched at the size they were taught. If you change resolution or the HUD
   scale, teach them again (or keep separate `data` folders).
