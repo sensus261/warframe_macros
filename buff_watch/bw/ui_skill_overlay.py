@@ -20,7 +20,6 @@ class _Slot:
 
 class SkillOverlay(Overlay):
     SETTINGS_KEY = "skills_overlay"
-    HANDLE_TEXT = "Skills overlay - drag me"
 
     def __init__(self, app):
         super().__init__(app)
@@ -101,11 +100,6 @@ class SkillOverlay(Overlay):
                 self.ak_label.pack(side="bottom", fill="x")
         elif self.ak_label.winfo_ismapped():
             self.ak_label.pack_forget()
-        want_handle = not ov["click_through"] or not visible
-        if want_handle and not self.handle.winfo_ismapped():
-            self.handle.pack(side="top", fill="x", before=self.body)
-        elif not want_handle and self.handle.winfo_ismapped():
-            self.handle.pack_forget()
         self.place()
 
     def _show_energy(self, result, now):

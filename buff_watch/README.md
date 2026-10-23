@@ -107,7 +107,7 @@ and the overlay's energy line blinks in the alert colour. If the bar isn't found
 your maximum energy, the same as the bar.
 
 **Skills overlay.** A second overlay shows the four slots magnified with the time left
-under each. Drag it by its blue bar; the *Skills overlay* tab has the same size, layout,
+under each. Drag it anywhere to move it (it has no title bar); the *Skills overlay* tab has the same size, layout,
 font, colour and position options as the buffs overlay, kept separately, plus *Show
 energy*. Untick *In overlay* on the Skills tab to leave a slot out.
 
