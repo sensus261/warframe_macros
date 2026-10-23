@@ -1,5 +1,6 @@
 """The user's library of named icons (buffs to track and icons to ignore)."""
 
+import inspect
 import json
 import os
 import threading
@@ -48,6 +49,22 @@ class Entry:
         }
 
 
+_ENTRY_FIELDS = set(inspect.signature(Entry.__init__).parameters) - {"self"}
+
+
+def _entry_from_json(item):
+    """An Entry from saved fields, or None. Fields this version doesn't know (a newer
+    version's library.json) are left out; missing ones get their defaults."""
+    if not isinstance(item, dict) or not item.get("id"):
+        return None
+    fields = {k: v for k, v in item.items() if k in _ENTRY_FIELDS}
+    fields.setdefault("name", "(unnamed)")
+    try:
+        return Entry(**fields)
+    except (TypeError, ValueError):
+        return None
+
+
 class Library:
     """Thread-safe list of entries. `version` changes whenever templates change."""
 
@@ -64,8 +81,10 @@ class Library:
                     raw = json.load(f)
             except (OSError, ValueError):
                 raw = []
-            for item in raw:
-                e = Entry(**item)
+            for item in raw if isinstance(raw, list) else []:
+                e = _entry_from_json(item)
+                if e is None:
+                    continue
                 e.image = cv2.imread(e.icon_path, cv2.IMREAD_COLOR)
                 if e.image is not None:
                     self.entries.append(e)

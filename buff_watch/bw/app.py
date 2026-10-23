@@ -1,13 +1,16 @@
 """Main window: source/region setup, live preview, buff library and unknown-icon queue."""
 
+import os
 import queue
+import subprocess
+import sys
 import time
 import tkinter as tk
-from tkinter import messagebox, simpledialog, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
 
 import cv2
 
-from . import config, keys, winutil
+from . import backup, config, keys, winutil
 from .autokey import AutoKey
 from .capture import CaptureError, ImageSource, ScreenSource, list_monitors
 from .catalog import Catalog
@@ -91,6 +94,14 @@ class App:
         self.source_box.bind("<Button-1>", lambda e: self._fill_sources())
         ttk.Button(top, text="Select buff area...", command=self.pick_region).pack(side="left", padx=4)
         ttk.Button(top, text="Teach icon...", command=self.teach).pack(side="left", padx=4)
+        cfg = ttk.Menubutton(top, text="Export / Import")
+        menu = tk.Menu(cfg, tearoff=False)
+        menu.add_command(label="Export configuration...", command=self.export_config)
+        menu.add_command(label="Import configuration...", command=self.import_config)
+        menu.add_separator()
+        menu.add_command(label="Open data folder", command=self.open_data_folder)
+        cfg["menu"] = menu
+        cfg.pack(side="left", padx=4)
         self.pause_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(top, text="Pause", variable=self.pause_var,
                         command=self._pause_changed).pack(side="left", padx=8)
@@ -1043,6 +1054,91 @@ class App:
         s = min(3.0, PREVIEW_W / img.shape[1], 240 / img.shape[0])
         self._preview_photo = to_photo(img, s, cv2.INTER_LINEAR)
         self.preview.configure(image=self._preview_photo)
+
+    # ------------------------------------------------------------ export / import
+    def _flush(self):
+        """Write everything still in memory to the data folder."""
+        self.save_settings()
+        self.library.save()
+        self.worker.skills.reader.save(force=True)
+
+    def export_config(self):
+        self._flush()
+        path = filedialog.asksaveasfilename(
+            parent=self.root, title="Export BuffWatch configuration",
+            defaultextension=".zip", filetypes=(("BuffWatch export", "*.zip"),),
+            initialfile="BuffWatch-config-%s.zip" % time.strftime("%Y-%m-%d"))
+        if not path:
+            return
+        try:
+            n = backup.export_config(path)
+        except OSError as e:
+            messagebox.showerror("BuffWatch", "Export failed:\n%s" % e, parent=self.root)
+            return
+        messagebox.showinfo("BuffWatch", "Exported %d files (settings, buffs, icons, skill "
+                            "profiles) to:\n%s" % (n, path), parent=self.root)
+
+    def import_config(self):
+        path = filedialog.askopenfilename(
+            parent=self.root, title="Import BuffWatch configuration",
+            filetypes=(("BuffWatch export", "*.zip"), ("All files", "*.*")))
+        if not path:
+            return
+        try:
+            info = backup.check_archive(path)
+        except backup.BadExport as e:
+            messagebox.showerror("BuffWatch", "Can't import this file:\n%s" % e,
+                                 parent=self.root)
+            return
+        if not messagebox.askyesno(
+                "BuffWatch", "Replace the whole configuration (settings, buffs, icons, skill "
+                "profiles) with this export?\n\n%s\nExported %s by version %s, %d files.\n\n"
+                "The current configuration is kept as a backup in the data folder's '%s' "
+                "folder. BuffWatch restarts to load the new configuration."
+                % (path, info["exported"], info["version"], info["files"], backup.BACKUP_DIR),
+                parent=self.root):
+            return
+        # Stop everything that writes to the data folder, then replace it and restart
+        # without saving the old in-memory state over the imported files.
+        self.worker.stop()
+        self.worker.join(timeout=5)
+        try:
+            saved = backup.import_config(path)
+        except (OSError, backup.BadExport) as e:
+            messagebox.showerror("BuffWatch", "Import failed:\n%s\n\nThe previous "
+                                 "configuration is in the data folder's '%s' folder."
+                                 % (e, backup.BACKUP_DIR), parent=self.root)
+        else:
+            if saved:
+                messagebox.showinfo("BuffWatch", "Imported. The previous configuration was "
+                                    "saved to:\n%s" % saved, parent=self.root)
+        self.restart()
+
+    def restart(self):
+        """Start a fresh BuffWatch and close this one without saving anything."""
+        if getattr(sys, "frozen", False):
+            cmd = [sys.executable] + sys.argv[1:]
+        else:
+            cmd = [sys.executable, os.path.abspath(sys.argv[0])] + sys.argv[1:]
+        self.sender.stop()
+        if self.hotkey is not None:
+            self.hotkey.stop()
+        try:
+            subprocess.Popen(cmd, cwd=os.getcwd())
+        except OSError as e:
+            messagebox.showerror("BuffWatch", "Couldn't restart (%s). Start BuffWatch "
+                                 "again yourself." % e, parent=self.root)
+        self.root.destroy()
+
+    def open_data_folder(self):
+        os.makedirs(config.DATA_DIR, exist_ok=True)
+        try:
+            if sys.platform == "win32":
+                os.startfile(config.DATA_DIR)
+            else:
+                subprocess.Popen(["xdg-open", config.DATA_DIR])
+        except OSError as e:
+            messagebox.showerror("BuffWatch", str(e), parent=self.root)
 
     def run(self):
         self.worker.start()

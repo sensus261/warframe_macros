@@ -172,7 +172,13 @@ other windows on top of exclusive fullscreen, and capturing it may give a black 
    come and go: pick bottom-right for an overlay in the bottom-right of the screen.
 
 Your icons and settings are saved in the `data` folder next to the program. To back them
-up or share them, copy that folder.
+up, share them or move them to another PC, use **Export / Import** in the top bar:
+**Export configuration...** writes everything (settings, overlay layouts, buffs, captured
+icons, skill profiles and learned digits) to one zip file, and **Import configuration...**
+replaces the whole configuration with such a zip and restarts BuffWatch. Before importing,
+the current configuration is saved to `data\backups`, so an import can be undone by
+importing that backup. Exports from older or newer versions load too: settings they lack
+get their defaults.
 
 ## Tuning
 
