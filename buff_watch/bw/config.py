@@ -127,10 +127,14 @@ SKILL_SLOT_DEFAULTS = {
 
 
 def _merge(base, override):
+    """Defaults overlaid with saved values. Keys the defaults don't have are kept (a newer
+    version's settings survive), and a saved value that should be a section but isn't is
+    dropped, so settings from older or newer versions (e.g. an imported export) still load."""
     out = copy.deepcopy(base)
     for k, v in override.items():
-        if isinstance(v, dict) and isinstance(out.get(k), dict):
-            out[k] = _merge(out[k], v)
+        if isinstance(out.get(k), dict):
+            if isinstance(v, dict):
+                out[k] = _merge(out[k], v)
         else:
             out[k] = v
     return out
@@ -143,6 +147,8 @@ def load_settings():
             data = json.load(f)
     except (OSError, ValueError):
         pass
+    if not isinstance(data, dict):
+        data = {}
     return _merge(DEFAULTS, data)
 
 

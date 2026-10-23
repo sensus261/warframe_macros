@@ -42,10 +42,10 @@ class Worker(threading.Thread):
         self.results = queue.Queue(maxsize=2)
         self.running = threading.Event()
         self.running.set()
-        self._stop = threading.Event()
+        self._quit = threading.Event()
 
     def stop(self):
-        self._stop.set()
+        self._quit.set()
 
     def capture_skill_icons(self):
         self.skills.request_capture()
@@ -80,7 +80,7 @@ class Worker(threading.Thread):
         source, source_cfg = None, None
         t_last = time.perf_counter()
         fps = 0.0
-        while not self._stop.is_set():
+        while not self._quit.is_set():
             period = 1.0 / max(1, float(self.settings.get("fps", 8)))
             t0 = time.perf_counter()
             if not self.running.is_set():
@@ -135,7 +135,7 @@ class Worker(threading.Thread):
             res.fps = fps
             self._push(res)
             spare = period - (time.perf_counter() - t0)
-            self._stop.wait(max(0.005, spare) if not res.error else 1.0)
+            self._quit.wait(max(0.005, spare) if not res.error else 1.0)
         if source is not None:
             source.close()
         self.skills.reader.save(force=True)

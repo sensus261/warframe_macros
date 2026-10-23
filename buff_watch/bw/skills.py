@@ -58,10 +58,18 @@ def slot_columns(roi):
 def profiles(settings):
     """The skill profiles (one per Warframe, say), creating "Default" from older settings."""
     sk = settings["skills"]
-    profs = sk.setdefault("profiles", [])
+    profs = sk.get("profiles")
+    # Drop anything that isn't a usable profile (e.g. from a hand-edited or newer export).
+    ok = [p for p in profs if isinstance(p, dict) and p.get("id")] \
+        if isinstance(profs, list) else []
+    if not isinstance(profs, list) or len(ok) != len(profs):
+        profs = sk["profiles"] = ok
     if not profs:
         profs.append({"id": "default", "name": "Default", "slots": sk.pop("slots", None) or []})
     for p in profs:
+        p.setdefault("name", p["id"])
+        if not isinstance(p.get("slots"), list):
+            p["slots"] = []
         for k, v in config.SKILL_PROFILE_DEFAULTS.items():
             p.setdefault(k, v)
     if sk.get("profile") not in {p["id"] for p in profs}:
@@ -95,6 +103,8 @@ def slot_settings(settings, i, profile=None):
     slots = (profile or active_profile(settings)).setdefault("slots", [])
     while len(slots) < N_SLOTS:
         slots.append({})
+    if not isinstance(slots[i], dict):
+        slots[i] = {}
     s = slots[i]
     s.setdefault("name", "Ability %d" % (i + 1))
     s.setdefault("key", str(i + 1))  # the game's default ability keys
