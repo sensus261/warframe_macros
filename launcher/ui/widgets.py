@@ -5,6 +5,16 @@ import customtkinter as ctk
 from . import icons, theme as t
 
 
+def update(widget, **options):
+    """configure() only the options that changed. customtkinter redraws a widget on every
+    configure(), which flickers when it is done on every refresh."""
+    applied = widget.__dict__.setdefault("_applied_options", {})
+    changed = {k: v for k, v in options.items() if k not in applied or applied[k] != v}
+    if changed:
+        widget.configure(**changed)
+        applied.update(changed)
+
+
 class Card(ctk.CTkFrame):
     def __init__(self, master, **kw):
         kw.setdefault("fg_color", t.CARD)
@@ -81,7 +91,7 @@ class Dot(ctk.CTkFrame):
                          fg_color=t.TONES[tone][0], **kw)
 
     def set(self, tone):
-        self.configure(fg_color=t.TONES[tone][0])
+        update(self, fg_color=t.TONES[tone][0])
 
 
 class Chip(ctk.CTkFrame):
