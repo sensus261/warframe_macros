@@ -275,6 +275,85 @@ class KeyEntry(ttk.Frame):
         top.bind("<KeyPress>", got)
 
 
+class DescriptionDialog(tk.Toplevel):
+    """Free-text description of a buff (what it does, where it comes from...)."""
+
+    def __init__(self, master, entry, on_done):
+        super().__init__(master)
+        self.title("BuffWatch - description of %s" % entry.name)
+        self.on_done = on_done
+        f = ttk.Frame(self, padding=10)
+        f.pack(fill="both", expand=True)
+        ttk.Label(f, text="What does '%s' do? Shown in the Buffs list and when you hover "
+                          "its row." % entry.name, wraplength=420, justify="left").pack(
+            anchor="w", pady=(0, 6))
+        self.text = tk.Text(f, width=56, height=8, wrap="word", font=("Segoe UI", 10),
+                            undo=True)
+        self.text.pack(fill="both", expand=True)
+        self.text.insert("1.0", entry.description or "")
+        bar = ttk.Frame(f)
+        bar.pack(fill="x", pady=(8, 0))
+        ttk.Label(bar, foreground="#666", text="Ctrl+Enter saves").pack(side="left")
+        ttk.Button(bar, text="Save", command=self._ok).pack(side="right")
+        ttk.Button(bar, text="Cancel", command=self.destroy).pack(side="right", padx=4)
+        self.text.bind("<Control-Return>", lambda e: (self._ok(), "break")[1])
+        self.bind("<Escape>", lambda e: self.destroy())
+        self.text.focus_set()
+        self.grab_set()
+
+    def _ok(self):
+        self.on_done(self.text.get("1.0", "end").strip())
+        self.destroy()
+
+
+class Tooltip:
+    """Small hover popup for the rows of a Treeview. `text_for(iid)` returns the text
+    (or "" for none)."""
+
+    def __init__(self, tree, text_for, delay=500):
+        self.tree = tree
+        self.text_for = text_for
+        self.delay = delay
+        self.row = None
+        self.job = None
+        self.tip = None
+        tree.bind("<Motion>", self._motion, add="+")
+        tree.bind("<Leave>", lambda e: self._hide(), add="+")
+        tree.bind("<ButtonPress>", lambda e: self._hide(), add="+")
+
+    def _motion(self, ev):
+        row = self.tree.identify_row(ev.y)
+        if row == self.row:
+            return
+        self._hide()
+        self.row = row
+        if row:
+            self.job = self.tree.after(self.delay, self._show)
+
+    def _show(self):
+        self.job = None
+        text = self.text_for(self.row) if self.row and self.tree.exists(self.row) else ""
+        if not text:
+            return
+        x = self.tree.winfo_pointerx() + 16
+        y = self.tree.winfo_pointery() + 12
+        self.tip = tk.Toplevel(self.tree)
+        self.tip.wm_overrideredirect(True)
+        self.tip.wm_geometry("+%d+%d" % (x, y))
+        tk.Label(self.tip, text=text, justify="left", wraplength=360, background="#ffffe8",
+                 relief="solid", borderwidth=1, padx=6, pady=4,
+                 font=("Segoe UI", 9)).pack()
+
+    def _hide(self):
+        if self.job:
+            self.tree.after_cancel(self.job)
+            self.job = None
+        if self.tip:
+            self.tip.destroy()
+            self.tip = None
+        self.row = None
+
+
 class AutoKeyDialog(tk.Toplevel):
     """Per-buff auto-press settings."""
 

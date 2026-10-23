@@ -13,7 +13,8 @@ from .capture import CaptureError, ImageSource, ScreenSource, list_monitors
 from .catalog import Catalog
 from .library import KIND_BUFF, KIND_IGNORE, Library
 from .ui_common import context_crop, thumb, to_photo
-from .ui_dialogs import AutoKeyDialog, BoxPicker, CatalogPicker, KeyEntry, RegionPicker
+from .ui_dialogs import (AutoKeyDialog, BoxPicker, CatalogPicker, DescriptionDialog, KeyEntry,
+                         RegionPicker, Tooltip)
 from .ui_overlay import Overlay
 from .skills import N_SLOTS, active_profile, slot_settings
 from .ui_overlay_settings import OverlaySettingsTab
@@ -158,16 +159,17 @@ class App:
     def _build_library_tab(self):
         f = ttk.Frame(self.nb, padding=4)
         self.nb.add(f, text="Buffs")
-        cols = ("pin", "name", "status", "auto", "score", "thr", "opts")
+        cols = ("pin", "name", "desc", "status", "auto", "score", "thr", "opts")
         self.tree = ttk.Treeview(f, columns=cols, height=8, selectmode="extended")
         self.tree.heading("#0", text="Icon")
         self.tree.column("#0", width=60, stretch=False)
-        for c, t, w in (("pin", "Overlay", 64), ("name", "Name", 220), ("status", "Status", 70),
+        for c, t, w in (("pin", "Overlay", 64), ("name", "Name", 180),
+                        ("desc", "Description", 200), ("status", "Status", 70),
                         ("auto", "Auto-press", 190), ("score", "Match", 56),
                         ("thr", "Threshold", 70), ("opts", "Options", 150)):
             self.tree.heading(c, text=t)
-            self.tree.column(c, width=w, stretch=c == "name",
-                             anchor="w" if c in ("name", "opts", "auto") else "center")
+            self.tree.column(c, width=w, stretch=c in ("name", "desc"),
+                             anchor="w" if c in ("name", "desc", "opts", "auto") else "center")
         self.tree.tag_configure("on", foreground="#0a7a20")
         self.tree.tag_configure("ignored", foreground="#999")
         self.tree.tag_configure("group", font=("Segoe UI", 10, "bold"), background="#e8ecf2")
@@ -176,6 +178,7 @@ class App:
         self.tree.grid(row=0, column=0, sticky="nsew")
         sb.grid(row=0, column=1, sticky="ns")
         self.tree.bind("<Double-1>", self._on_double_click)
+        Tooltip(self.tree, self._row_tooltip)
         for ev in ("<<TreeviewOpen>>", "<<TreeviewClose>>"):
             # Fired before the row actually opens/closes, so read the state afterwards.
             self.tree.bind(ev, lambda e: self.root.after_idle(self._save_group_state))
@@ -190,7 +193,8 @@ class App:
         for text, cmd in (("Add from catalog...", self.add_from_catalog),
                           ("Show / hide in overlay", self.toggle_pin),
                           ("Auto-press key...", self.set_autokey),
-                          ("Rename", self.rename), ("Threshold...", self.set_threshold)):
+                          ("Rename", self.rename), ("Description...", self.set_description),
+                          ("Threshold...", self.set_threshold)):
             ttk.Button(bar, text=text, command=cmd).pack(side="left", padx=2)
         bar2 = ttk.Frame(f)
         bar2.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(4, 0))
@@ -204,7 +208,8 @@ class App:
         ttk.Checkbutton(bar2, text="Show ignored", variable=self.show_ignored,
                         command=self.refresh_tree).pack(side="right")
         ttk.Label(f, foreground="#666", text=(
-            "Double-click a row to show/hide it in the overlay. Drag rows to reorder them or "
+            "Double-click a row to show/hide it in the overlay (double-click its description "
+            "to edit it; hover a row to read all of it). Drag rows to reorder them or "
             "to move them into another group; drag a group's header to reorder groups. Select "
             "several rows with Ctrl/Shift. Select a group's header to rename or delete it. "
             "'Coloured icon' matches in grayscale instead of white-only "
@@ -238,7 +243,7 @@ class App:
             for g in groups + [None]:
                 n = sum(1 for e in entries if self._entry_group(e) == g)
                 self.tree.insert("", "end", iid=_group_iid(g), open=(g or "") not in collapsed,
-                                 values=("", "%s  (%d)" % (g or "Ungrouped", n)) + ("",) * 5,
+                                 values=("", "%s  (%d)" % (g or "Ungrouped", n)) + ("",) * 6,
                                  tags=("group",))
         for e in entries:
             if e.id not in self._thumbs:
@@ -266,8 +271,12 @@ class App:
             live = self.autokey_status.get(e.id)
             if live:
                 auto += " - " + live
+        desc = " ".join((e.description or "").split())  # one line in the list
+        if len(desc) > 80:
+            desc = desc[:79] + "\u2026"
         return ("yes" if e.pinned else "",
                 e.name,
+                desc,
                 "ACTIVE" if present else "-",
                 auto,
                 "%.2f" % score if score else "",
@@ -334,8 +343,29 @@ class App:
             self.tree.item(row, open=not self.tree.item(row, "open"))
             self._save_group_state()
             return "break"
+        if row and self.tree.column(self.tree.identify_column(ev.x), "id") == "desc":
+            self.tree.selection_set(row)
+            self.set_description()
+            return "break"
         self.toggle_pin()
         return None
+
+    def _row_tooltip(self, iid):
+        e = self.library.get(iid)
+        return e.description if e else ""
+
+    def set_description(self):
+        sel = self._selected()
+        if len(sel) != 1:
+            messagebox.showinfo("BuffWatch", "Select one buff first.", parent=self.root)
+            return
+        e = sel[0]
+
+        def done(text):
+            self.library.update(e.id, description=text)
+            self.refresh_tree()
+
+        DescriptionDialog(self.root, e, done)
 
     def rename(self):
         sel = self._selected()

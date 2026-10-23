@@ -16,7 +16,7 @@ KIND_IGNORE = "ignore"
 class Entry:
     def __init__(self, id, name, kind=KIND_BUFF, pinned=False, threshold=None,
                  mode="white", alert_missing=False, catalog=None, learned=True,
-                 key=None, key_interval=1500, key_max=5, group=None):
+                 key=None, key_interval=1500, key_max=5, group=None, description=""):
         self.id = id
         self.name = name
         self.kind = kind
@@ -30,6 +30,7 @@ class Entry:
         self.key_interval = key_interval  # ms between presses
         self.key_max = key_max  # presses before giving up until the buff is seen again
         self.group = group  # Buffs list group name (None = ungrouped)
+        self.description = description  # free-text note, e.g. what the buff does
         self.image = None  # BGR numpy array
 
     @property
@@ -43,6 +44,7 @@ class Entry:
             "alert_missing": self.alert_missing, "catalog": self.catalog,
             "learned": self.learned, "key": self.key, "key_interval": self.key_interval,
             "key_max": self.key_max, "group": self.group,
+            "description": self.description,
         }
 
 
