@@ -189,6 +189,9 @@ up or share them, copy that folder.
   it), and you can drag buffs between groups or drag a group's header to move the whole
   group. Select a header to rename or delete it. Groups only tidy the list, they don't
   change what the overlay shows.
+- **Buff descriptions.** *Description...* (or double-clicking a row's Description cell)
+  lets you write what a buff does. The list shows the first line; hover the row to read it
+  all.
 - The live preview at the top of the window draws boxes around icons: green for known buffs,
   grey for ignored icons, yellow for new ones.
 
