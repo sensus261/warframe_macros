@@ -48,6 +48,21 @@ DEFAULTS = {
         # the overlay's miss_frames so the first press lands right after expiry.
         "miss_frames": 1,
     },
+    # Ability watching: the four ability slots in the bottom-right HUD (see README).
+    "skills": {
+        "enabled": True,
+        # The four slots as fractions (x0, y0, x1, y1) of the capture, split in four columns.
+        "roi": [0.8819, 0.9167, 0.9431, 0.9511],
+        "digit_scale": None,  # learned automatically from the first clear timer
+        "miss_frames": 2,  # scans the number may be missing before the timer counts as over
+        # Energy bar, as the fractions (x0, y0, x1, y1) of its left and right ends.
+        "energy_bar": [0.8822, 0.9428, 0.9397, 0.9528],
+        # Skill profiles (one per Warframe): {"id", "name", "slots": [per slot: see
+        # SKILL_SLOT_DEFAULTS, plus "name" and "key"], "min_energy"}. Made on first use.
+        "profiles": [],
+        "profile": None,  # id of the active profile
+        "auto_profile": True,  # switch profile when another profile's ready icons show
+    },
     # Buffs list groups (list only, the overlay ignores them): names in display order, and
     # the collapsed ones ("" = the Ungrouped section). A buff's group is stored on its entry.
     "groups": [],
@@ -85,6 +100,29 @@ DEFAULTS = {
         "click_through": False,
         "hide_from_capture": True,
     },
+}
+
+
+# The skills overlay is a second overlay window with the same options as the buff one.
+DEFAULTS["skills_overlay"] = dict(
+    DEFAULTS["overlay"], x=60, y=600, orientation="horizontal", zoom=3.0,
+    dim_missing=0.6,  # brightness of a slot while its ability is ready
+    show_energy=True,  # energy line under the slots
+)
+
+SKILL_PROFILE_DEFAULTS = {
+    "min_energy": 0,  # don't auto-press below this energy percent (0 = no limit)
+}
+
+# Per ability slot (a profile's "slots"[i]). "name" defaults to "Ability N" and
+# "key" to the slot number, the game's default binding.
+SKILL_SLOT_DEFAULTS = {
+    "auto": False,  # auto-press this slot's key
+    "early": 0.0,  # seconds before the timer ends to press (0 = when it ends)
+    "interval": 1500,  # ms between presses while the ability doesn't come back
+    "max": 5,  # presses before giving up until the timer is seen again
+    "hold": 50,  # ms to hold the key (longer for hold-to-cast abilities)
+    "show": True,  # show the slot in the skills overlay
 }
 
 

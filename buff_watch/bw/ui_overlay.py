@@ -48,6 +48,9 @@ class _Cell:
 
 
 class Overlay(tk.Toplevel):
+    SETTINGS_KEY = "overlay"
+    HANDLE_TEXT = "BuffWatch overlay - drag me"
+
     def __init__(self, app):
         super().__init__(app.root)
         self.app = app
@@ -63,7 +66,7 @@ class Overlay(tk.Toplevel):
                               padx=6, pady=2)
         self.ak_label = tk.Label(self, text="AUTO-PRESS OFF", bg="#444", fg="#ffcc00",
                                  font=("Segoe UI", 8, "bold"), padx=4)
-        self.handle = tk.Label(self, text="BuffWatch overlay - drag me", bg="#2b5d9b",
+        self.handle = tk.Label(self, text=self.HANDLE_TEXT, bg="#2b5d9b",
                                fg="white", font=("Segoe UI", 8), padx=4)
         self.cells = {}
         self.order = []
@@ -76,9 +79,13 @@ class Overlay(tk.Toplevel):
         self._style_window()
         self.place()
 
+    @property
+    def cfg(self):
+        return self.app.settings[self.SETTINGS_KEY]
+
     # ------------------------------------------------------------ window state
     def apply_settings(self):
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         if not ov["visible"]:
             self.withdraw()
             return
@@ -92,20 +99,20 @@ class Overlay(tk.Toplevel):
         self.attributes("-alpha", max(0.2, min(1.0, float(ov["opacity"]))))
 
     def _style_window(self):
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         bg = ov["background_color"] if ov["solid_background"] else KEY
         self.configure(bg=bg)
         self.body.configure(bg=bg)
 
     def _anchor(self):
-        a = self.app.settings["overlay"]["anchor"]
+        a = self.cfg["anchor"]
         return a if a in ANCHORS else "top-left"
 
     def place(self):
         """Position the window so its anchor corner sits at the saved x, y."""
         if self._drag:
             return
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         self.update_idletasks()
         a = self._anchor()
         x, y = int(ov["x"]), int(ov["y"])
@@ -120,7 +127,7 @@ class Overlay(tk.Toplevel):
     def remember_position(self):
         """Store the current spot of the anchor corner as x, y (after a drag, or after
         the anchor corner changes, so the window stays where it is)."""
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         self.update_idletasks()
         a = self._anchor()
         x, y = self.winfo_x(), self.winfo_y()
@@ -133,7 +140,7 @@ class Overlay(tk.Toplevel):
 
     def snap_to(self, corner, margin=20):
         """Anchor to `corner` of the monitor the overlay is on."""
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         cx = self.winfo_x() + self.winfo_width() // 2
         cy = self.winfo_y() + self.winfo_height() // 2
         mon = None
@@ -173,14 +180,14 @@ class Overlay(tk.Toplevel):
         self._drag = None
         self.remember_position()
         self.app.save_settings()
-        self.app.overlay_moved()
+        self.app.overlay_moved(self)
 
     # ------------------------------------------------------------ content
     def _sync_cells(self, pinned):
         ids = [e.id for e in pinned]
         if ids == self.order:
             return
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         for cid in list(self.cells):
             if cid not in ids:
                 self.cells.pop(cid).frame.destroy()
@@ -194,7 +201,7 @@ class Overlay(tk.Toplevel):
         self.visible = None  # force a regrid
 
     def _regrid(self, visible):
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         mode = ov["orientation"]
         if mode == "horizontal":
             cols = max(1, len(visible))
@@ -224,7 +231,7 @@ class Overlay(tk.Toplevel):
         self.place()
 
     def show(self, result, unknown_count, now, autokey_status=None, autokey_on=True):
-        ov = self.app.settings["overlay"]
+        ov = self.cfg
         if not ov["visible"]:
             return
         entries = [e for e in self.app.library.snapshot()[0] if e.pinned and e.kind == "buff"]

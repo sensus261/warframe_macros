@@ -1,5 +1,6 @@
-"""The Overlay tab of the main window: every look, layout and position setting of
-the overlay, applied live and saved to settings.json."""
+"""The Buffs overlay tab of the main window: every look, layout and position setting of
+the overlay, applied live and saved to settings.json. The Skills overlay tab is the
+same tab pointed at the skills overlay."""
 
 import tkinter as tk
 from tkinter import colorchooser, font as tkfont, messagebox, ttk
@@ -15,6 +16,22 @@ KEEP_ON_RESET = ("visible", "click_through", "hide_from_capture", "x", "y", "anc
 REBUILD = ("orientation", "columns", "cell_gap", "cell_padding", "border_width",
            "name_position", "font_family", "font_size", "font_bold", "cell_color",
            "solid_background", "background_color", "text_color")
+
+
+# Labels that change on the Skills overlay tab.
+SKILL_TEXT = {
+    "Show pinned buffs while they are off (dimmed)": "Show abilities while they are ready",
+    "Show buff names": "Show ability names",
+    "Gap between buffs (px)": "Gap between abilities (px)",
+    "Padding inside each buff (px)": "Padding inside each ability (px)",
+    "Name colour (buff on)": "Text colour (ability active)",
+    "Name colour (buff off)": "Text colour (ability ready)",
+    "Alert colour (off buff set to alert)": "Alert colour (auto-press gave up)",
+    "Brightness of off buffs": "Brightness of ready abilities",
+    "Fill the gaps between buffs": "Fill the gaps between abilities",
+    "Flash colour (buff turns on / off)": "Flash colour (timer starts / ends)",
+    "Buff background": "Ability background",
+}
 
 
 class _Scrolled(ttk.Frame):
@@ -41,9 +58,11 @@ class _Scrolled(ttk.Frame):
 
 
 class OverlaySettingsTab(_Scrolled):
-    def __init__(self, parent, app):
+    def __init__(self, parent, app, key="overlay"):
         super().__init__(parent)
         self.app = app
+        self.key = key  # settings section: "overlay" or "skills_overlay"
+        self._words = SKILL_TEXT if key == "skills_overlay" else {}
         self.vars = {}  # settings key -> (tk variable, kind)
         self._color_buttons = {}
         self._percent_labels = []
@@ -59,6 +78,8 @@ class OverlaySettingsTab(_Scrolled):
                           ("hide_from_capture", "Hide overlay from screen capture / recordings\n"
                                                 "(stops BuffWatch reading its own overlay)")):
             self._check(g, key, text)
+        if self.key == "skills_overlay":
+            self._check(g, "show_energy", "Show energy (blinks below the auto-press limit)")
 
         g = self._section(f, "Size and layout", 0, 1)
         self._spin(g, "zoom", "Zoom", 1.0, 8.0, 0.25, float)
@@ -125,17 +146,24 @@ class OverlaySettingsTab(_Scrolled):
         return g._rows - 1
 
     def _ov(self):
-        return self.app.settings["overlay"]
+        return self.app.settings[self.key]
+
+    @property
+    def overlay(self):
+        return self.app.skill_overlay if self.key == "skills_overlay" else self.app.overlay
+
+    def _t(self, text):
+        return self._words.get(text, text)
 
     def _check(self, g, key, text):
         v = tk.BooleanVar(value=bool(self._ov()[key]))
         self.vars[key] = (v, bool)
-        ttk.Checkbutton(g, text=text, variable=v, command=self._changed).grid(
+        ttk.Checkbutton(g, text=self._t(text), variable=v, command=self._changed).grid(
             row=self._next_row(g), column=0, columnspan=2, sticky="w", pady=1)
 
     def _label(self, g, text):
         r = self._next_row(g)
-        ttk.Label(g, text=text).grid(row=r, column=0, sticky="w", pady=2, padx=(0, 6))
+        ttk.Label(g, text=self._t(text)).grid(row=r, column=0, sticky="w", pady=2, padx=(0, 6))
         return r
 
     def _spin(self, g, key, text, lo, hi, step, kind):
@@ -226,7 +254,7 @@ class OverlaySettingsTab(_Scrolled):
     def _changed(self):
         ov = self._ov()
         new = self._read()
-        overlay = self.app.overlay
+        overlay = self.overlay
         if new.get("anchor", ov["anchor"]) != ov["anchor"]:
             # Keep the window where it is: re-measure x, y from the new corner.
             ov["anchor"] = new["anchor"]
@@ -253,7 +281,7 @@ class OverlaySettingsTab(_Scrolled):
                 pass
 
     def _snap(self, corner):
-        self.app.overlay.snap_to(corner)
+        self.overlay.snap_to(corner)
         self.app.save_settings()
         self.sync_position()
 
@@ -270,7 +298,7 @@ class OverlaySettingsTab(_Scrolled):
                                    parent=self):
             return
         ov = self._ov()
-        for key, val in config.DEFAULTS["overlay"].items():
+        for key, val in config.DEFAULTS[self.key].items():
             if key not in KEEP_ON_RESET:
                 ov[key] = val
         for key, spec in self.vars.items():
@@ -284,6 +312,6 @@ class OverlaySettingsTab(_Scrolled):
         for moved in self._percent_labels:
             moved()
         self.app.save_settings()
-        self.app.overlay.apply_settings()
-        self.app.overlay.refresh_layout()
+        self.overlay.apply_settings()
+        self.overlay.refresh_layout()
         self._update_states()

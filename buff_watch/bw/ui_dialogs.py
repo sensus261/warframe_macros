@@ -40,9 +40,14 @@ class _DragRect:
 class RegionPicker(tk.Toplevel):
     """Shows a full screenshot; the user drags a box around the buff area."""
 
-    def __init__(self, master, full_bgr, roi, on_done):
+    BUFF_PROMPT = ("Drag a box around the area where buff icons appear "
+                   "(include room to the left - the list grows leftwards). "
+                   "Enter = save, Esc = cancel.")
+
+    def __init__(self, master, full_bgr, roi, on_done, title="select the buff area",
+                 prompt=BUFF_PROMPT):
         super().__init__(master)
-        self.title("BuffWatch - select the buff area")
+        self.title("BuffWatch - " + title)
         self.on_done = on_done
         H, W = full_bgr.shape[:2]
         sw, sh = self.winfo_screenwidth() * 0.9, self.winfo_screenheight() * 0.8
@@ -50,9 +55,7 @@ class RegionPicker(tk.Toplevel):
         self.img_w, self.img_h = int(W * self.scale), int(H * self.scale)
         self.photo = to_photo(cv2.resize(full_bgr, (self.img_w, self.img_h),
                                           interpolation=cv2.INTER_AREA))
-        ttk.Label(self, text="Drag a box around the area where buff icons appear "
-                             "(include room to the left - the list grows leftwards). "
-                             "Enter = save, Esc = cancel.").pack(anchor="w", padx=6, pady=4)
+        ttk.Label(self, text=prompt).pack(anchor="w", padx=6, pady=4)
         c = tk.Canvas(self, width=self.img_w, height=self.img_h, highlightthickness=0,
                       cursor="crosshair")
         c.pack()

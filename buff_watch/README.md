@@ -14,7 +14,7 @@ corner of the screen, recognises the icons you taught it, and shows the ones you
   When a new icon shows up, BuffWatch looks it up in the catalog:
   - **Certain match:** it's named automatically, for example "Recognised: Mod: Growing
     Power" in the status bar.
-  - **Possible matches:** the *New icons* tab shows the top candidates as one-click buttons.
+  - **Possible matches:** the *New buffs detections* tab shows the top candidates as one-click buttons.
   - **No match:** you type a name, or mark it "not a buff". The catalog is from around 2020,
     so newer arcanes and Incarnon/Citrine-era buffs often aren't in it.
 - **Add buffs before you see them.** *Buffs → Add from catalog...* lets you search by name
@@ -24,6 +24,9 @@ corner of the screen, recognises the icons you taught it, and shows the ones you
   and press *Show / hide in overlay*) to choose which buffs appear big in the overlay.
 - **Optional auto-press when a buff expires.** Give a buff a key and BuffWatch taps that key
   until the buff is back. This is opt-in automation; see below.
+- **Ability timers.** BuffWatch also watches your four abilities in the bottom right, reads
+  the seconds left on each active one, shows them in a second overlay, and can recast an
+  ability when it runs out or a few seconds before. See *Abilities* below.
 
 ## Is this safe to use with Warframe?
 
@@ -34,7 +37,8 @@ share or the Windows Snipping Tool do. Specifically, it:
 - does **not** read or change game files or network traffic
 - uses only ordinary Windows calls on **its own** windows (always on top, click-through,
   hidden from screen capture), plus a call that reads the position of the game window
-- does **not** send any keyboard or mouse input **unless you turn on auto-press for a buff**
+- does **not** send any keyboard or mouse input **unless you turn on auto-press for a buff
+  or an ability**
 
 That puts it in the same category as screen recorders and streaming overlays, not cheats,
 and it gives you no information you can't already see on your screen. Neither I nor anyone
@@ -72,6 +76,61 @@ What happens in game:
   game. While it's off, the overlay shows `AUTO-PRESS OFF`. The hotkey uses Windows'
   `RegisterHotKey`, not a keyboard hook.
 
+## Abilities
+
+While an ability is active, Warframe shows the seconds left over its icon ("41", or "9.4"
+under ten seconds). The **Skills** tab reads those numbers for all four abilities.
+
+1. **Ability area.** The default fits a 16:9 screen at 100% HUD scale. If the Skills tab
+   shows nothing, click **Select ability area...** and drag a box around the four ability
+   icons: tight on the left and right (it is cut into four equal slots), tall enough to
+   include the numbers.
+2. **Cast an ability once.** The first clear timer tells BuffWatch how big the digits are
+   on your screen ("HUD scale found"). After a resolution or HUD scale change, click
+   **Re-detect HUD scale**.
+3. **Capture ready icons** (optional) with every ability ready. BuffWatch then knows when the
+   HUD is hidden (menus, cutscenes), so auto-press never fires there. It also captures a
+   slot by itself the first time it is ready while another slot shows a timer.
+
+**Profiles.** Each Warframe gets its own profile: slot names, keys, auto-press settings,
+energy limit and captured ready icons. Use *New...* (empty), *Copy...* (start from the
+current one), *Rename...* and *Delete* next to the profile list. With **Switch by itself**
+ticked, BuffWatch switches to the profile whose ready icons are on screen, so after you
+*Capture ready icons* once per Warframe, picking that Warframe in game picks its profile.
+It never switches away from a profile that has no captured icons yet.
+
+**Energy.** BuffWatch reads how full the energy bar under the abilities is (white = filled,
+cyan = empty), shows it on the Skills tab and under the skills overlay. Set **Don't
+auto-press below X% energy** (per profile) and auto-press holds off while energy is lower,
+and the overlay's energy line blinks in the alert colour. If the bar isn't found, click
+**Select energy bar...** and drag from its left end to its right end. The percentage is of
+your maximum energy, the same as the bar.
+
+**Skills overlay.** A second overlay shows the four slots magnified with the time left
+under each. Drag it by its blue bar; the *Skills overlay* tab has the same size, layout,
+font, colour and position options as the buffs overlay, kept separately, plus *Show
+energy*. Untick *In overlay* on the Skills tab to leave a slot out.
+
+**Auto-press per ability** (Skills tab):
+
+- **Auto-press** on, and the **Key** the ability is bound to (1-4 by default).
+- **Press early (s)**: press this many seconds before the timer ends. 0 = press when it ends.
+- **Retry every (ms)** and **Give up after**: if no new timer shows up (no energy, blocked,
+  in a menu), it presses again every interval, up to the limit. It re-arms once it sees the
+  ability's timer again.
+- **Hold key (ms)**: how long the key is held, for abilities you hold to cast.
+
+It only presses for an ability after seeing its timer once, never while the HUD is hidden,
+and uses the same on/off switch, F8 hotkey and "only while Warframe is focused" check as buff
+auto-press. Abilities without a duration (no number) are never pressed.
+
+**How the reading works.** The numbers are matched against digit pictures taken from real
+screenshots, and each slot keeps its own countdown, so a misread frame doesn't throw it off.
+The bundled digits don't include **3** yet; BuffWatch learns missing digits from your own
+running timers (the countdown says what the number must be), and the Skills tab lists the
+digits it knows. Until it knows a digit, a timer showing it is kept alive from the countdown
+for up to 3 seconds instead of being treated as ended.
+
 ## Install & run (Windows 10/11)
 
 1. Install **Python 3.9 or newer** from <https://www.python.org/downloads/> and tick
@@ -94,14 +153,14 @@ other windows on top of exclusive fullscreen, and capturing it may give a black 
 3. **Teach icons.** Most common buffs get named by themselves once they appear. For the
    rest, or to pin buffs ahead of time, *Add from catalog...* on the Buffs tab is quickest.
    Other ways:
-   - Wait. Icons that stay still for a moment show up in **New icons**. Type a name and
+   - Wait. Icons that stay still for a moment show up in **New buffs detections**. Type a name and
      click *Save + show in overlay*. If the box cuts off the icon or includes the number,
      click *Fix the box...* first. For things that aren't buffs, click
      *Not a buff (ignore forever)* and you won't be asked again.
    - Click **Teach icon...** at the top, drag a tight box around one icon (just the symbol,
      not the number), and name it. It's easiest with the buff active and the game paused
      or with you standing still.
-4. **Overlay tab.** Drag the overlay by its blue bar to where you want it (or use the
+4. **Buffs overlay tab.** Drag the overlay by its blue bar to where you want it (or use the
    snap-to-corner buttons), then tick **Lock overlay** so mouse clicks go through it to the
    game. The tab also sets the zoom, a vertical, horizontal or grid layout, spacing, font,
    name position, colours, opacity and how dim off buffs look. Every change shows at once.
@@ -134,6 +193,14 @@ up or share them, copy that folder.
   grey for ignored icons, yellow for new ones.
 
 ## Testing without the game
+
+`tests/test_skills.py` checks the ability-timer reader on HUD crops from real screenshots:
+
+```
+.venv\Scripts\python.exe tests\test_skills.py
+```
+
+To run the whole app on screenshots instead of the screen:
 
 ```
 .venv\Scripts\python.exe buffwatch.pyw --image path\to\screenshot.png
