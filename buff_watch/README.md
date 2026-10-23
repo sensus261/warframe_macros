@@ -14,7 +14,7 @@ corner of the screen, recognises the icons you taught it, and shows the ones you
   When a new icon shows up, BuffWatch looks it up in the catalog:
   - **Certain match:** it's named automatically, for example "Recognised: Mod: Growing
     Power" in the status bar.
-  - **Possible matches:** the *New icons* tab shows the top candidates as one-click buttons.
+  - **Possible matches:** the *New buffs detections* tab shows the top candidates as one-click buttons.
   - **No match:** you type a name, or mark it "not a buff". The catalog is from around 2020,
     so newer arcanes and Incarnon/Citrine-era buffs often aren't in it.
 - **Add buffs before you see them.** *Buffs → Add from catalog...* lets you search by name
@@ -92,10 +92,24 @@ under ten seconds). The **Skills** tab reads those numbers for all four abilitie
    HUD is hidden (menus, cutscenes), so auto-press never fires there. It also captures a
    slot by itself the first time it is ready while another slot shows a timer.
 
+**Profiles.** Each Warframe gets its own profile: slot names, keys, auto-press settings,
+energy limit and captured ready icons. Use *New...* (empty), *Copy...* (start from the
+current one), *Rename...* and *Delete* next to the profile list. With **Switch by itself**
+ticked, BuffWatch switches to the profile whose ready icons are on screen, so after you
+*Capture ready icons* once per Warframe, picking that Warframe in game picks its profile.
+It never switches away from a profile that has no captured icons yet.
+
+**Energy.** BuffWatch reads how full the energy bar under the abilities is (white = filled,
+cyan = empty), shows it on the Skills tab and under the skills overlay. Set **Don't
+auto-press below X% energy** (per profile) and auto-press holds off while energy is lower,
+and the overlay's energy line blinks in the alert colour. If the bar isn't found, click
+**Select energy bar...** and drag from its left end to its right end. The percentage is of
+your maximum energy, the same as the bar.
+
 **Skills overlay.** A second overlay shows the four slots magnified with the time left
 under each. Drag it by its blue bar; the *Skills overlay* tab has the same size, layout,
-font, colour and position options as the buff overlay, kept separately. Untick *In overlay*
-on the Skills tab to leave a slot out.
+font, colour and position options as the buffs overlay, kept separately, plus *Show
+energy*. Untick *In overlay* on the Skills tab to leave a slot out.
 
 **Auto-press per ability** (Skills tab):
 
@@ -139,14 +153,14 @@ other windows on top of exclusive fullscreen, and capturing it may give a black 
 3. **Teach icons.** Most common buffs get named by themselves once they appear. For the
    rest, or to pin buffs ahead of time, *Add from catalog...* on the Buffs tab is quickest.
    Other ways:
-   - Wait. Icons that stay still for a moment show up in **New icons**. Type a name and
+   - Wait. Icons that stay still for a moment show up in **New buffs detections**. Type a name and
      click *Save + show in overlay*. If the box cuts off the icon or includes the number,
      click *Fix the box...* first. For things that aren't buffs, click
      *Not a buff (ignore forever)* and you won't be asked again.
    - Click **Teach icon...** at the top, drag a tight box around one icon (just the symbol,
      not the number), and name it. It's easiest with the buff active and the game paused
      or with you standing still.
-4. **Overlay tab.** Drag the overlay by its blue bar to where you want it (or use the
+4. **Buffs overlay tab.** Drag the overlay by its blue bar to where you want it (or use the
    snap-to-corner buttons), then tick **Lock overlay** so mouse clicks go through it to the
    game. The tab also sets the zoom, a vertical, horizontal or grid layout, spacing, font,
    name position, colours, opacity and how dim off buffs look. Every change shows at once.

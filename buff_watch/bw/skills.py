@@ -34,7 +34,8 @@ ADVANCE, DOT_EXTRA = 10, 5  # template-scale x distance between digits, extra ac
 _FORMAT = re.compile(r"^(\d\.\d|\d{2,3})$")
 
 DIGITS_FILE = os.path.join(config.DATA_DIR, "skill_digits.npz")
-SLOT_REF_FILE = os.path.join(config.DATA_DIR, "skill_slot_%d.png")
+ICON_DIR = os.path.join(config.DATA_DIR, "skill_icons")  # ready look of each slot, per profile
+OLD_REF_FILE = os.path.join(config.DATA_DIR, "skill_slot_%d.png")  # before profiles
 
 
 def _bundled_digits_path():
@@ -53,10 +54,45 @@ def slot_columns(roi):
     return [roi[:, int(round(i * w)):int(round((i + 1) * w))] for i in range(N_SLOTS)]
 
 
-def slot_settings(settings, i):
-    """Settings of slot `i` with defaults filled in (older settings files lack keys)."""
+# ---------------------------------------------------------------- profiles
+def profiles(settings):
+    """The skill profiles (one per Warframe, say), creating "Default" from older settings."""
     sk = settings["skills"]
-    slots = sk.setdefault("slots", [])
+    profs = sk.setdefault("profiles", [])
+    if not profs:
+        profs.append({"id": "default", "name": "Default", "slots": sk.pop("slots", None) or []})
+    for p in profs:
+        for k, v in config.SKILL_PROFILE_DEFAULTS.items():
+            p.setdefault(k, v)
+    if sk.get("profile") not in {p["id"] for p in profs}:
+        sk["profile"] = profs[0]["id"]
+    return profs
+
+
+def active_profile(settings):
+    pid = settings["skills"].get("profile")
+    profs = profiles(settings)
+    return next((p for p in profs if p["id"] == pid), profs[0])
+
+
+def new_profile(settings, name, copy_from=None):
+    """Add a profile (a copy of `copy_from`'s slots, if given) and return it."""
+    profs = profiles(settings)
+    base = "".join(c for c in name.lower() if c.isalnum())[:24] or "profile"
+    pid, n = base, 2
+    while any(p["id"] == pid for p in profs):
+        pid, n = "%s%d" % (base, n), n + 1
+    p = {"id": pid, "name": name, "slots": [], "min_energy": 0}
+    if copy_from:
+        p["slots"] = [dict(x) for x in copy_from["slots"]]
+        p["min_energy"] = copy_from.get("min_energy", 0)
+    profs.append(p)
+    return p
+
+
+def slot_settings(settings, i, profile=None):
+    """Settings of slot `i` in the active profile, with defaults filled in."""
+    slots = (profile or active_profile(settings)).setdefault("slots", [])
     while len(slots) < N_SLOTS:
         slots.append({})
     s = slots[i]
@@ -65,6 +101,60 @@ def slot_settings(settings, i):
     for k, v in config.SKILL_SLOT_DEFAULTS.items():
         s.setdefault(k, v)
     return s
+
+
+def icon_path(profile_id, i):
+    return os.path.join(ICON_DIR, "%s_%d.png" % (profile_id, i + 1))
+
+
+# ---------------------------------------------------------------- energy bar
+ENERGY_PAD = 0.008  # capture this much (fraction of height) above and below the bar
+
+
+def energy_rect(settings):
+    """Capture area (fractions x0, y0, x1, y1) around the energy bar."""
+    x0, y0, x1, y1 = settings["skills"]["energy_bar"]
+    return [min(x0, x1), max(0.0, min(y0, y1) - ENERGY_PAD),
+            max(x0, x1), min(1.0, max(y0, y1) + ENERGY_PAD)]
+
+
+def read_energy(img, bar, rect):
+    """How full the energy bar is (0..1) in `img`, the capture of `rect`; None if no
+    bar is there. The filled part of the bar is white, the empty part cyan."""
+    h, w = img.shape[:2]
+    if w < 8 or h < 4:
+        return None
+    rx0, ry0, rx1, ry1 = rect
+    bx0, by0, bx1, by1 = bar
+    if bx1 < bx0:
+        bx0, by0, bx1, by1 = bx1, by1, bx0, by0
+    sy = h / max(1e-6, ry1 - ry0)
+    ya, yb = (by0 - ry0) * sy, (by1 - ry0) * sy
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    half = max(2, int(round(h * 0.17)))
+    white, lit = [], 0
+    for x in range(w):
+        yc = int(round(ya + (yb - ya) * x / max(1, w - 1)))
+        band = hsv[max(0, yc - half):yc + half + 1, x]
+        if band.size == 0:
+            white.append(False)
+            continue
+        v, s_ = band[:, 2].astype(int), band[:, 1].astype(int)
+        white.append(bool(((v >= 170) & (s_ < 60)).any()))
+        lit += bool((v >= 110).any())
+    if lit < 0.6 * w:
+        return None  # nothing bar-like along the line: HUD hidden or area wrong
+    # The fill runs from the left end; stop at the first real gap so bright scenery
+    # behind the empty part isn't counted.
+    end, gap = 0, 0
+    for x, wh in enumerate(white):
+        if wh:
+            end, gap = x + 1, 0
+        else:
+            gap += 1
+            if gap > max(3, w // 30) and end:
+                break
+    return end / w
 
 
 # ---------------------------------------------------------------- digit reading
@@ -321,28 +411,85 @@ class SkillWatcher:
         self.reader = reader or DigitReader()
         self.trackers = [_Tracker() for _ in range(N_SLOTS)]
         self.states = [SlotState(i) for i in range(N_SLOTS)]
-        self.refs = [None] * N_SLOTS  # grey image of each slot while ready
-        self._load_refs()
+        self._refs = {}  # profile id -> [grey image of each slot while ready]
         self._capture_refs = False
+        self._match_at = float("-inf")
+        self._switch = None  # (profile id, since) another profile whose icons are on screen
+        self.energy = None  # 0..1 from the energy bar, None = not found
+        self._energy = []  # last few readings, for a median
 
     # ------------------------------------------------------------ ready icons
-    def _load_refs(self):
-        for i in range(N_SLOTS):
-            path = SLOT_REF_FILE % (i + 1)
-            if os.path.exists(path):
-                self.refs[i] = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+    @property
+    def refs(self):
+        return self._profile_refs(active_profile(self.settings)["id"])
+
+    def _profile_refs(self, pid):
+        if pid not in self._refs:
+            refs = []
+            for i in range(N_SLOTS):
+                path = icon_path(pid, i)
+                if pid == "default" and not os.path.exists(path) and os.path.exists(
+                        OLD_REF_FILE % (i + 1)):
+                    path = OLD_REF_FILE % (i + 1)
+                refs.append(cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+                            if os.path.exists(path) else None)
+            self._refs[pid] = refs
+        return self._refs[pid]
 
     def request_capture(self):
         """Save the next scan's slots as their ready look (call with every ability ready)."""
         self._capture_refs = True
 
     def _set_ref(self, i, gray):
-        self.refs[i] = gray.copy()
+        pid = active_profile(self.settings)["id"]
+        self._profile_refs(pid)[i] = gray.copy()
         try:
-            os.makedirs(config.DATA_DIR, exist_ok=True)
-            cv2.imwrite(SLOT_REF_FILE % (i + 1), gray)
+            os.makedirs(ICON_DIR, exist_ok=True)
+            cv2.imwrite(icon_path(pid, i), gray)
         except OSError:
             pass
+
+    def forget_profile(self, pid):
+        self._refs.pop(pid, None)
+        for i in range(N_SLOTS):
+            try:
+                os.remove(icon_path(pid, i))
+            except OSError:
+                pass
+
+    def _auto_switch(self, grays, readings, sims, now):
+        """Switch to the profile whose ready icons are on screen (a different Warframe),
+        when the current profile's icons clearly aren't."""
+        sk = self.settings["skills"]
+        if not sk.get("auto_profile") or now - self._match_at < 0.5:
+            return
+        self._match_at = now
+        idle = [i for i in range(N_SLOTS) if not readings[i].present]
+        if len(idle) < 3:
+            return
+        cur = active_profile(self.settings)["id"]
+
+        def matches(refs, lo):
+            vals = [self._similarity(refs[i], grays[i]) for i in idle]
+            return sum(v is not None and v >= lo for v in vals)
+
+        # A profile without captured icons yet (just made) is never switched away from.
+        if (sum(r is not None for r in self.refs) < 3
+                or matches(self.refs, 0.75) >= len(idle) - 1):
+            self._switch = None
+            return
+        best = None
+        for p in profiles(self.settings):
+            if p["id"] != cur and matches(self._profile_refs(p["id"]), 0.8) >= len(idle):
+                best = p["id"]
+                break
+        if best is None:
+            self._switch = None
+        elif self._switch is None or self._switch[0] != best:
+            self._switch = (best, now)
+        elif now - self._switch[1] >= 1.5:  # held steady: not a passing flicker
+            sk["profile"] = best
+            self._switch = None
 
     @staticmethod
     def _similarity(ref, gray):
@@ -382,6 +529,16 @@ class SkillWatcher:
             sk["digit_scale"] = round(best.scale, 3)  # found the HUD scale; stop searching
         return best
 
+    def update_energy(self, img, rect):
+        e = read_energy(img, self.settings["skills"]["energy_bar"], rect)
+        if e is None:
+            self._energy = []
+            self.energy = None
+        else:
+            self._energy = (self._energy + [e])[-3:]
+            self.energy = float(np.median(self._energy))
+        return self.energy
+
     def process(self, roi, capture_h, now, miss_s=0.25):
         """Update and return the four SlotStates for this scan of the skills area."""
         cols = slot_columns(roi)
@@ -394,6 +551,7 @@ class SkillWatcher:
                 if not readings[i].present:
                     self._set_ref(i, g)
         sims = [self._similarity(self.refs[i], g) for i, g in enumerate(grays)]
+        self._auto_switch(grays, readings, sims, now)
         any_timer = any(r.present for r in readings)
         hud = any_timer or any(s is not None and s >= READY_SIM for s in sims)
         x = 0

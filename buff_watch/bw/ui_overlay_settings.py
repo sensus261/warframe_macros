@@ -1,4 +1,4 @@
-"""The Overlay tab of the main window: every look, layout and position setting of
+"""The Buffs overlay tab of the main window: every look, layout and position setting of
 the overlay, applied live and saved to settings.json. The Skills overlay tab is the
 same tab pointed at the skills overlay."""
 
@@ -78,6 +78,8 @@ class OverlaySettingsTab(_Scrolled):
                           ("hide_from_capture", "Hide overlay from screen capture / recordings\n"
                                                 "(stops BuffWatch reading its own overlay)")):
             self._check(g, key, text)
+        if self.key == "skills_overlay":
+            self._check(g, "show_energy", "Show energy (blinks below the auto-press limit)")
 
         g = self._section(f, "Size and layout", 0, 1)
         self._spin(g, "zoom", "Zoom", 1.0, 8.0, 0.25, float)

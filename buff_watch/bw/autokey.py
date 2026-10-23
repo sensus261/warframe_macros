@@ -79,9 +79,10 @@ class AutoKey:
             status[e.id] = "pressing %s (%d/%d)" % (e.key, st.presses, e.key_max)
         return status
 
-    def update_skills(self, slots, states, now=None):
-        """`slots`: per-slot settings; `states`: skills.SlotState list from the scan.
-        Returns {slot index: status text} for slots with auto-press on."""
+    def update_skills(self, slots, states, now=None, energy=None, min_energy=0):
+        """`slots`: per-slot settings; `states`: skills.SlotState list from the scan;
+        `energy`: 0..1 from the energy bar (None = unknown). Below `min_energy` percent
+        nothing is pressed. Returns {slot index: status text} for slots with auto-press on."""
         from .skills import SlotState
 
         now = time.monotonic() if now is None else now
@@ -122,6 +123,9 @@ class AutoKey:
                 continue
             if not self.enabled:
                 status[i] = "auto-press off"
+                continue
+            if min_energy and energy is not None and energy * 100 < min_energy:
+                status[i] = "low energy (%d%%), not pressing" % round(energy * 100)
                 continue
             if focused is None:
                 focused = self._game_focused()

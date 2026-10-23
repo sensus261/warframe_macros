@@ -2,11 +2,13 @@
 on each and what auto-press is doing. Same look and layout options as the buff overlay,
 kept separately in settings["skills_overlay"]."""
 
+import tkinter as tk
+
 import cv2
 
-from .skills import SlotState, slot_settings
+from .skills import SlotState, active_profile, slot_settings
 from .ui_common import to_photo
-from .ui_overlay import Overlay
+from .ui_overlay import Overlay, _font
 
 
 class _Slot:
@@ -19,6 +21,11 @@ class _Slot:
 class SkillOverlay(Overlay):
     SETTINGS_KEY = "skills_overlay"
     HANDLE_TEXT = "Skills overlay - drag me"
+
+    def __init__(self, app):
+        super().__init__(app)
+        self.energy_label = tk.Label(self, padx=6, pady=1)
+        self._bind_drag(self.energy_label)
 
     def apply_settings(self):
         if not self.app.settings["skills"]["enabled"]:
@@ -87,6 +94,7 @@ class SkillOverlay(Overlay):
         if visible != self.visible:
             self._regrid(visible)
 
+        self._show_energy(result, now)
         any_auto = any(slot_settings(self.app.settings, i)["auto"] for i in range(4))
         if any_auto and not autokey_on:
             if not self.ak_label.winfo_ismapped():
@@ -99,3 +107,26 @@ class SkillOverlay(Overlay):
         elif not want_handle and self.handle.winfo_ismapped():
             self.handle.pack_forget()
         self.place()
+
+    def _show_energy(self, result, now):
+        """Energy line under the slots; alert colours (blinking) below the profile's
+        auto-press limit."""
+        ov = self.cfg
+        energy = result.energy if result is not None else None
+        if not ov.get("show_energy", True) or energy is None:
+            if self.energy_label.winfo_ismapped():
+                self.energy_label.pack_forget()
+            return
+        low = active_profile(self.app.settings)["min_energy"]
+        pct = round(energy * 100)
+        text = "Energy %d%%" % pct
+        if low and pct < low:
+            text += " - below %d%%, auto-press paused" % low
+            blink = int(now * 2) % 2 == 0
+            fg, bg = (ov["background_color"], ov["alert_color"]) if blink else (
+                ov["alert_color"], ov["cell_color"])
+        else:
+            fg, bg = ov["text_color"], ov["cell_color"]
+        self.energy_label.configure(text=text, fg=fg, bg=bg, font=_font(ov))
+        if not self.energy_label.winfo_ismapped():
+            self.energy_label.pack(side="bottom", fill="x", after=self.body)

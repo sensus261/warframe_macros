@@ -7,7 +7,7 @@ import time
 
 from .capture import CaptureError, ImageSource, ScreenSource
 from .detector import Detector
-from .skills import SkillWatcher
+from .skills import SkillWatcher, energy_rect
 
 
 class Result:
@@ -23,6 +23,8 @@ class Result:
         self.scores = {}  # entry_id -> best score this frame
         self.skill_roi = None  # BGR image of the ability slots (None = skills off)
         self.skills = []  # skills.SlotState per slot
+        self.energy = None  # 0..1 from the energy bar (None = not found / skills off)
+        self.profile = None  # active skill profile id (it can switch by itself)
         self.error = None
         self.fps = 0.0
 
@@ -47,6 +49,10 @@ class Worker(threading.Thread):
 
     def capture_skill_icons(self):
         self.skills.request_capture()
+
+    def forget_skill_profile(self, pid):
+        with self.lock:
+            self.skills.forget_profile(pid)
 
     def resolve_unknown(self, uid):
         with self.lock:
@@ -109,6 +115,10 @@ class Worker(threading.Thread):
                     miss_s = (int(sk["miss_frames"]) + 0.5) * period
                     res.skills = self.skills.process(sroi, cap_h, time.monotonic(), miss_s)
                     res.skill_roi = sroi
+                    erect = energy_rect(self.settings)
+                    eimg, _ = source.grab_roi(erect)
+                    res.energy = self.skills.update_energy(eimg, erect)
+                    res.profile = self.settings["skills"].get("profile")
                 res.roi, res.capture_h = roi, cap_h
                 res.detections, res.new_unknowns = dets, new
                 for d in dets:

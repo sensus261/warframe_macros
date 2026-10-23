@@ -55,7 +55,13 @@ DEFAULTS = {
         "roi": [0.8819, 0.9167, 0.9431, 0.9511],
         "digit_scale": None,  # learned automatically from the first clear timer
         "miss_frames": 2,  # scans the number may be missing before the timer counts as over
-        "slots": [],  # per slot: see SKILL_SLOT_DEFAULTS, plus "name" and "key"
+        # Energy bar, as the fractions (x0, y0, x1, y1) of its left and right ends.
+        "energy_bar": [0.8822, 0.9428, 0.9397, 0.9528],
+        # Skill profiles (one per Warframe): {"id", "name", "slots": [per slot: see
+        # SKILL_SLOT_DEFAULTS, plus "name" and "key"], "min_energy"}. Made on first use.
+        "profiles": [],
+        "profile": None,  # id of the active profile
+        "auto_profile": True,  # switch profile when another profile's ready icons show
     },
     # Buffs list groups (list only, the overlay ignores them): names in display order, and
     # the collapsed ones ("" = the Ungrouped section). A buff's group is stored on its entry.
@@ -101,9 +107,14 @@ DEFAULTS = {
 DEFAULTS["skills_overlay"] = dict(
     DEFAULTS["overlay"], x=60, y=600, orientation="horizontal", zoom=3.0,
     dim_missing=0.6,  # brightness of a slot while its ability is ready
+    show_energy=True,  # energy line under the slots
 )
 
-# Per ability slot (settings["skills"]["slots"][i]). "name" defaults to "Ability N" and
+SKILL_PROFILE_DEFAULTS = {
+    "min_energy": 0,  # don't auto-press below this energy percent (0 = no limit)
+}
+
+# Per ability slot (a profile's "slots"[i]). "name" defaults to "Ability N" and
 # "key" to the slot number, the game's default binding.
 SKILL_SLOT_DEFAULTS = {
     "auto": False,  # auto-press this slot's key

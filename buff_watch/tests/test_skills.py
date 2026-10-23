@@ -5,13 +5,20 @@ Run from the buff_watch folder:  python -m pytest tests   (or: python tests/test
 
 import os
 import sys
+import tempfile
 
 import cv2
+import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 
 from bw import config, skills  # noqa: E402
+
+# Keep the tests' captured slot icons out of the real data folder.
+_TMP = tempfile.mkdtemp()
+skills.ICON_DIR = _TMP
+skills.OLD_REF_FILE = os.path.join(_TMP, "old_%d.png")
 
 # Each crop is 260x100 px; the four ability slots sit at x 32..228, y 20..82.
 SLOTS = (32, 20, 228, 82)
@@ -64,9 +71,8 @@ def test_reads_timers():
 
 def test_watcher_states_and_scale():
     s = _settings()
+    s["skills"]["profiles"] = [{"id": "states", "name": "States"}]
     w = skills.SkillWatcher(s, _bundled_only())
-    w.refs = [None] * 4
-    w._set_ref = lambda i, g: w.refs.__setitem__(i, g.copy())
     st = w.process(_roi("active2"), 1800, 0.0)
     assert [x.state for x in st] == ["ready", "active", "active", "active"]
     assert abs(s["skills"]["digit_scale"] - 1.0) < 0.01
@@ -112,8 +118,57 @@ def test_learns_missing_digit():
     assert reader.read(col, 1.0).text == "41"
 
 
+def test_energy_bar():
+    """Fill of the energy bar; the screenshots show 755 (full), 452, 741, 685, 0, 11."""
+    want = {"off": 1.0, "on": 0.599, "casting4": 0.981, "active2": 0.907, "zero": 0.0,
+            "zero_active": 0.015}
+    bar = [33 / 260, 67 / 100, 217 / 260, 85 / 100]  # bar ends inside the 260x100 crops
+    rect = [bar[0], bar[1] - 0.1, bar[2], bar[3] + 0.1]
+    for name, e in want.items():
+        im = cv2.imread(os.path.join(HERE, "skills", name + ".png"))
+        x0, y0 = int(round(rect[0] * 260)), int(round(rect[1] * 100))
+        x1, y1 = int(round(rect[2] * 260)), int(round(rect[3] * 100))
+        got = skills.read_energy(im[y0:y1, x0:x1], bar, rect)
+        assert got is not None and abs(got - e) <= 0.03, (name, got, e)
+    assert skills.read_energy(np.zeros((30, 180, 3), np.uint8), bar, rect) is None
+
+
+def test_profiles():
+    s = _settings()
+    s["skills"]["slots"] = [{"name": "Sonar", "key": "2"}]  # settings from before profiles
+    profs = skills.profiles(s)
+    assert [p["id"] for p in profs] == ["default"] and "slots" not in s["skills"]
+    assert skills.slot_settings(s, 0)["name"] == "Sonar"
+    b = skills.new_profile(s, "Banshee", copy_from=profs[0])
+    b2 = skills.new_profile(s, "Banshee!")
+    assert b["id"] == "banshee" and b2["id"] == "banshee2"
+    s["skills"]["profile"] = b2["id"]
+    assert skills.slot_settings(s, 0)["name"] == "Ability 1"
+    s["skills"]["profile"] = b["id"]
+    assert skills.slot_settings(s, 0)["name"] == "Sonar"
+
+
+def test_profile_switches_by_icons():
+    s = _settings()
+    banshee = skills.new_profile(s, "Banshee")
+    other = skills.new_profile(s, "Other")
+    w = skills.SkillWatcher(s, _bundled_only())
+    cols = [cv2.cvtColor(c, cv2.COLOR_BGR2GRAY) for c in skills.slot_columns(_roi("off"))]
+    rng = np.random.default_rng(1)
+    w._refs[banshee["id"]] = cols
+    w._refs[other["id"]] = [rng.integers(0, 255, c.shape, dtype=np.uint8) for c in cols]
+    s["skills"]["profile"] = other["id"]
+    for t in (0.0, 1.0, 2.0):
+        w.process(_roi("off"), 1800, t)
+    assert s["skills"]["profile"] == banshee["id"]
+    for t in (3.0, 4.0, 5.0):  # and it stays on the profile that matches
+        w.process(_roi("zero"), 1800, t)
+    assert s["skills"]["profile"] == banshee["id"]
+
+
 if __name__ == "__main__":
     for fn in (test_reads_timers, test_watcher_states_and_scale, test_countdown_locks_and_runs,
-               test_learns_missing_digit):
+               test_learns_missing_digit, test_energy_bar, test_profiles,
+               test_profile_switches_by_icons):
         fn()
         print("ok", fn.__name__)
