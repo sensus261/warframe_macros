@@ -22,22 +22,53 @@ corner of the screen, recognises the icons you taught it, and shows the ones you
   switches to how the icon really looks on your screen.
 - **You choose what to magnify.** On the *Buffs* tab, double-click rows (or select several
   and press *Show / hide in overlay*) to choose which buffs appear big in the overlay.
+- **Optional auto-press when a buff expires.** Give a buff a key and BuffWatch taps that key
+  until the buff is back. This is opt-in automation; see below.
 
 ## Is this safe to use with Warframe?
 
-BuffWatch only **looks at the screen**, the same way OBS, Discord screen share or the
-Windows Snipping Tool do. Specifically, it:
+Out of the box, BuffWatch only **looks at the screen**, the same way OBS, Discord screen
+share or the Windows Snipping Tool do. Specifically, it:
 
 - does **not** read or write the game's memory, inject anything, or hook into the game
-- does **not** send any keyboard or mouse input (it doesn't automate anything)
 - does **not** read or change game files or network traffic
 - uses only ordinary Windows calls on **its own** windows (always on top, click-through,
   hidden from screen capture), plus a call that reads the position of the game window
+- does **not** send any keyboard or mouse input **unless you turn on auto-press for a buff**
 
 That puts it in the same category as screen recorders and streaming overlays, not cheats,
 and it gives you no information you can't already see on your screen. Neither I nor anyone
 outside Digital Extremes can guarantee how their anti-cheat behaves, but this is the
 least-invasive kind of tool there is.
+
+**Auto-press is different.** It sends simulated key presses (Windows `SendInput`, the same
+thing AutoHotkey uses) in reaction to what is on screen. That's automation. It's still not a
+memory hack, but Digital Extremes' rules on macros apply to it, so use it at your own risk.
+It stays completely inactive until you assign a key to a buff.
+
+## Auto-press when a buff expires
+
+1. On the *Buffs* tab, select a buff and click **Auto-press key...**.
+2. Set the **key** the ability or item is bound to in game. You can type it (`4`, `shift+e`,
+   `f5`, `mouse4`...) or click *Record* and press it.
+3. **Press every (ms)**: how long to wait between presses. Make it longer than the cast
+   animation, because a second press can cancel or re-cast the ability.
+4. **Give up after (presses)**: the most presses per expiry (default 5).
+
+What happens in game:
+
+- It starts only after BuffWatch has seen the buff **active** at least once. A buff you
+  never cast doesn't trigger anything.
+- When the buff disappears, the key is tapped right away, then every *interval* until the
+  buff shows up again. The overlay shows `pressing 4 (2/5)` under the buff.
+- After the maximum number of presses it gives up (out of energy, in a menu, ability
+  blocked...). It re-arms once it sees the buff again.
+- By default it only presses while the **Warframe window is focused**, so alt-tabbing to
+  Discord or a browser pauses it. Chat windows inside the game still count as focused, so
+  switch it off before typing a long message.
+- **F8** (configurable on the *Auto-press* tab) turns auto-press on or off from inside the
+  game. While it's off, the overlay shows `AUTO-PRESS OFF`. The hotkey uses Windows'
+  `RegisterHotKey`, not a keyboard hook.
 
 ## Install & run (Windows 10/11)
 

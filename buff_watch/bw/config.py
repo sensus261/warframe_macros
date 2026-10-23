@@ -39,6 +39,12 @@ DEFAULTS = {
     "catalog_auto_threshold": 0.72,
     "catalog_only": False,  # drop new icons that look like nothing in the catalog
     "icon_frac": None,  # on-screen icon size / capture height, learned automatically
+    # Opt-in auto-press of a buff's key when it runs out (see README).
+    "autokey": {
+        "enabled": True,  # master switch, also flipped by the toggle hotkey
+        "toggle_hotkey": "f8",
+        "only_when_focused": True,  # never send keys unless the game window has focus
+    },
     # Overlay window.
     "overlay": {
         "visible": True,

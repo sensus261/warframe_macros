@@ -5,6 +5,7 @@ from tkinter import messagebox, ttk
 
 import cv2
 
+from . import keys
 from .ui_common import to_photo
 
 
@@ -216,4 +217,114 @@ class CatalogPicker(tk.Toplevel):
         if cur is None:
             return
         self.on_done(cur[0], cur[1], pin)
+        self.destroy()
+
+
+class KeyEntry(ttk.Frame):
+    """A key field: type a key name ('4', 'shift+e', 'f5', 'mouse4') or click Record
+    and press the key."""
+
+    def __init__(self, master, value="", on_change=None):
+        super().__init__(master)
+        self.on_change = on_change
+        self.var = tk.StringVar(value=value or "")
+        self.entry = ttk.Entry(self, textvariable=self.var, width=14)
+        self.entry.pack(side="left")
+        self.entry.bind("<Return>", lambda e: self._commit())
+        self.entry.bind("<FocusOut>", lambda e: self._commit())
+        self.btn = ttk.Button(self, text="Record", command=self._record)
+        self.btn.pack(side="left", padx=4)
+        self._last = self.var.get()
+
+    def get(self):
+        return self.var.get().strip().lower()
+
+    def valid(self):
+        try:
+            keys.parse(self.get())
+            return True
+        except ValueError:
+            return False
+
+    def _commit(self):
+        v = self.get()
+        if v != self._last and (not v or self.valid()):
+            self._last = v
+            if self.on_change:
+                self.on_change(v)
+
+    def _record(self):
+        self.btn.configure(text="press a key...")
+        top = self.winfo_toplevel()
+        top.focus_force()
+
+        def got(ev):
+            name = keys.from_tk_event(ev)
+            if name is None or name in keys.MODIFIERS:
+                return "break"  # wait for the real key (modifiers are combined in)
+            top.unbind("<KeyPress>")
+            self.btn.configure(text="Record")
+            if name != "escape":
+                self.var.set(name)
+                self._commit()
+            return "break"
+
+        top.bind("<KeyPress>", got)
+
+
+class AutoKeyDialog(tk.Toplevel):
+    """Per-buff auto-press settings."""
+
+    def __init__(self, master, entry, on_done):
+        super().__init__(master)
+        self.title("BuffWatch - auto-press for %s" % entry.name)
+        self.on_done = on_done
+        f = ttk.Frame(self, padding=10)
+        f.pack(fill="both", expand=True)
+        ttk.Label(f, wraplength=420, justify="left", text=(
+            "When '%s' runs out, BuffWatch taps this key until it sees the buff again. "
+            "Use the key the ability or item is bound to in game." % entry.name)).grid(
+            row=0, column=0, columnspan=2, sticky="w", pady=(0, 8))
+        ttk.Label(f, text="Key:").grid(row=1, column=0, sticky="w")
+        self.key = KeyEntry(f, entry.key or "")
+        self.key.grid(row=1, column=1, sticky="w")
+        ttk.Label(f, foreground="#666", text="e.g. 4, shift+e, f5, mouse4").grid(
+            row=2, column=1, sticky="w")
+        ttk.Label(f, text="Press every (ms):").grid(row=3, column=0, sticky="w", pady=(8, 0))
+        self.interval = tk.IntVar(value=entry.key_interval)
+        ttk.Spinbox(f, from_=300, to=30000, increment=100, textvariable=self.interval,
+                    width=8).grid(row=3, column=1, sticky="w", pady=(8, 0))
+        ttk.Label(f, foreground="#666", wraplength=300, justify="left",
+                  text="Longer than the cast animation, or a second press may cancel it."
+                  ).grid(row=4, column=1, sticky="w")
+        ttk.Label(f, text="Give up after (presses):").grid(row=5, column=0, sticky="w", pady=(8, 0))
+        self.max = tk.IntVar(value=entry.key_max)
+        ttk.Spinbox(f, from_=1, to=50, textvariable=self.max, width=8).grid(
+            row=5, column=1, sticky="w", pady=(8, 0))
+        bar = ttk.Frame(f)
+        bar.grid(row=6, column=0, columnspan=2, sticky="e", pady=(12, 0))
+        ttk.Button(bar, text="Save", command=self._ok).pack(side="right")
+        ttk.Button(bar, text="Turn off", command=self._off).pack(side="right", padx=4)
+        ttk.Button(bar, text="Cancel", command=self.destroy).pack(side="right")
+        self.bind("<Escape>", lambda e: self.destroy())
+        self.grab_set()
+
+    def _ok(self):
+        k = self.key.get()
+        if not k:
+            return self._off()
+        if not self.key.valid():
+            messagebox.showwarning("BuffWatch", "Unknown key '%s'." % k, parent=self)
+            return
+        try:
+            interval = max(300, int(self.interval.get()))
+            n = max(1, int(self.max.get()))
+        except (tk.TclError, ValueError):
+            messagebox.showwarning("BuffWatch", "Enter whole numbers.", parent=self)
+            return
+        self.on_done(k, interval, n)
+        self.destroy()
+
+    def _off(self):
+        self.on_done(None, int(self.interval.get() or 1500), int(self.max.get() or 5))
         self.destroy()

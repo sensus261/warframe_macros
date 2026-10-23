@@ -15,7 +15,8 @@ KIND_IGNORE = "ignore"
 
 class Entry:
     def __init__(self, id, name, kind=KIND_BUFF, pinned=False, threshold=None,
-                 mode="white", alert_missing=False, catalog=None, learned=True):
+                 mode="white", alert_missing=False, catalog=None, learned=True,
+                 key=None, key_interval=1500, key_max=5):
         self.id = id
         self.name = name
         self.kind = kind
@@ -25,6 +26,9 @@ class Entry:
         self.alert_missing = alert_missing  # highlight in red while a pinned buff is missing
         self.catalog = catalog  # catalog icon file this entry came from, if any
         self.learned = learned  # False while the image is still the catalog artwork
+        self.key = key  # auto-press this key while the buff is off (None = feature off)
+        self.key_interval = key_interval  # ms between presses
+        self.key_max = key_max  # presses before giving up until the buff is seen again
         self.image = None  # BGR numpy array
 
     @property
@@ -36,7 +40,8 @@ class Entry:
             "id": self.id, "name": self.name, "kind": self.kind, "pinned": self.pinned,
             "threshold": self.threshold, "mode": self.mode,
             "alert_missing": self.alert_missing, "catalog": self.catalog,
-            "learned": self.learned,
+            "learned": self.learned, "key": self.key, "key_interval": self.key_interval,
+            "key_max": self.key_max,
         }
 
 

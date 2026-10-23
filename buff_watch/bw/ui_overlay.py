@@ -39,6 +39,8 @@ class Overlay(tk.Toplevel):
         self.body.pack()
         self.badge = tk.Label(self, bg="#7a1f1f", fg="white", font=("Segoe UI", 9, "bold"),
                               padx=6, pady=2)
+        self.ak_label = tk.Label(self, text="AUTO-PRESS OFF", bg="#444", fg="#ffcc00",
+                                 font=("Segoe UI", 8, "bold"), padx=4)
         self.handle = tk.Label(self, text="BuffWatch overlay - drag me", bg="#2b5d9b",
                                fg="white", font=("Segoe UI", 8), padx=4)
         self.cells = {}
@@ -111,7 +113,7 @@ class Overlay(tk.Toplevel):
         self.order = []
         self._layout([e for e in self.app.library.snapshot()[0] if e.pinned and e.kind == "buff"])
 
-    def show(self, result, unknown_count, now):
+    def show(self, result, unknown_count, now, autokey_status=None, autokey_on=True):
         ov = self.app.settings["overlay"]
         if not ov["visible"]:
             return
@@ -141,8 +143,11 @@ class Overlay(tk.Toplevel):
                 c.frame.grid()
             c.photo = to_photo(img, zoom, cv2.INTER_LINEAR)
             c.img.configure(image=c.photo)
-            if ov["show_names"] or not present:
+            auto = (autokey_status or {}).get(e.id)
+            if ov["show_names"] or not present or auto:
                 label = e.name if present else e.name + "  (off)"
+                if auto and not present:
+                    label += "\n" + auto
                 if c.text.cget("text") != label:
                     c.text.configure(text=label)
                 if not c.text.winfo_ismapped():
@@ -154,6 +159,12 @@ class Overlay(tk.Toplevel):
             border = "#ffd400" if now < c.flash_until else ("#d02020" if missing_alert else BG)
             c.frame.configure(highlightbackground=border)
 
+        any_key = any(e.key for e in self.app.library.snapshot()[0])
+        if any_key and not autokey_on:
+            if not self.ak_label.winfo_ismapped():
+                self.ak_label.pack(side="bottom", fill="x")
+        elif self.ak_label.winfo_ismapped():
+            self.ak_label.pack_forget()
         if unknown_count:
             self.badge.configure(text="%d new icon%s - name %s in BuffWatch" % (
                 unknown_count, "" if unknown_count == 1 else "s",

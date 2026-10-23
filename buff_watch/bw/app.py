@@ -7,12 +7,13 @@ from tkinter import messagebox, simpledialog, ttk
 
 import cv2
 
-from . import config, winutil
+from . import config, keys, winutil
+from .autokey import AutoKey
 from .capture import CaptureError, ImageSource, ScreenSource, list_monitors
 from .catalog import Catalog
 from .library import KIND_BUFF, KIND_IGNORE, Library
 from .ui_common import context_crop, thumb, to_photo
-from .ui_dialogs import BoxPicker, CatalogPicker, RegionPicker
+from .ui_dialogs import AutoKeyDialog, BoxPicker, CatalogPicker, KeyEntry, RegionPicker
 from .ui_overlay import Overlay
 from .worker import Worker
 
@@ -28,6 +29,11 @@ class App:
         self.library.load()
         self.catalog = Catalog().load()
         self.worker = Worker(self.settings, self.library, self.catalog, image_path)
+        self.sender = keys.Sender()
+        self.autokey = AutoKey(self.settings, self.sender, keys.foreground_title)
+        self.autokey_status = {}
+        self.hotkey_events = queue.Queue()
+        self.hotkey = None
         self.result = None
         self.unknowns = []
         self.unknown_idx = 0
@@ -75,6 +81,7 @@ class App:
         self._build_unknown_tab()
         self._build_overlay_tab()
         self._build_settings_tab()
+        self._build_autokey_tab()
 
     def _fill_sources(self):
         opts = []
@@ -122,15 +129,16 @@ class App:
     def _build_library_tab(self):
         f = ttk.Frame(self.nb, padding=4)
         self.nb.add(f, text="Buffs")
-        cols = ("pin", "name", "status", "score", "thr", "opts")
+        cols = ("pin", "name", "status", "auto", "score", "thr", "opts")
         self.tree = ttk.Treeview(f, columns=cols, height=8, selectmode="extended")
         self.tree.heading("#0", text="Icon")
         self.tree.column("#0", width=60, stretch=False)
-        for c, t, w in (("pin", "Overlay", 64), ("name", "Name", 220), ("status", "Status", 80),
-                        ("score", "Match", 60), ("thr", "Threshold", 72), ("opts", "Options", 170)):
+        for c, t, w in (("pin", "Overlay", 64), ("name", "Name", 220), ("status", "Status", 70),
+                        ("auto", "Auto-press", 190), ("score", "Match", 56),
+                        ("thr", "Threshold", 70), ("opts", "Options", 150)):
             self.tree.heading(c, text=t)
             self.tree.column(c, width=w, stretch=c == "name",
-                             anchor="w" if c in ("name", "opts") else "center")
+                             anchor="w" if c in ("name", "opts", "auto") else "center")
         self.tree.tag_configure("on", foreground="#0a7a20")
         self.tree.tag_configure("ignored", foreground="#999")
         sb = ttk.Scrollbar(f, orient="vertical", command=self.tree.yview)
@@ -145,20 +153,24 @@ class App:
         bar.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(6, 0))
         for text, cmd in (("Add from catalog...", self.add_from_catalog),
                           ("Show / hide in overlay", self.toggle_pin),
-                          ("Rename", self.rename), ("Threshold...", self.set_threshold),
-                          ("Warn when missing", self.toggle_alert),
+                          ("Auto-press key...", self.set_autokey),
+                          ("Rename", self.rename), ("Threshold...", self.set_threshold)):
+            ttk.Button(bar, text=text, command=cmd).pack(side="left", padx=2)
+        bar2 = ttk.Frame(f)
+        bar2.grid(row=2, column=0, columnspan=2, sticky="ew", pady=(4, 0))
+        for text, cmd in (("Warn when missing", self.toggle_alert),
                           ("Coloured icon", self.toggle_mode),
                           ("Up", lambda: self.move(-1)), ("Down", lambda: self.move(1)),
                           ("Delete", self.delete)):
-            ttk.Button(bar, text=text, command=cmd).pack(side="left", padx=2)
+            ttk.Button(bar2, text=text, command=cmd).pack(side="left", padx=2)
         self.show_ignored = tk.BooleanVar(value=False)
-        ttk.Checkbutton(bar, text="Show ignored", variable=self.show_ignored,
+        ttk.Checkbutton(bar2, text="Show ignored", variable=self.show_ignored,
                         command=self.refresh_tree).pack(side="right")
         ttk.Label(f, foreground="#666", text=(
             "Double-click a row to show/hide it in the overlay. Select several rows with "
             "Ctrl/Shift. 'Coloured icon' matches in grayscale instead of white-only "
             "(use it for icons that are not white).")).grid(
-            row=2, column=0, columnspan=2, sticky="w", pady=(4, 0))
+            row=3, column=0, columnspan=2, sticky="w", pady=(4, 0))
         self.refresh_tree()
 
     def _selected(self):
@@ -188,9 +200,16 @@ class App:
             opts.append("warn when missing")
         if e.mode == "gray":
             opts.append("coloured")
+        auto = ""
+        if e.key:
+            auto = "%s every %.1fs" % (e.key, e.key_interval / 1000.0)
+            live = self.autokey_status.get(e.id)
+            if live:
+                auto += " - " + live
         return ("yes" if e.pinned else "",
                 e.name,
                 "ACTIVE" if present else "-",
+                auto,
                 "%.2f" % score if score else "",
                 "%.2f" % e.threshold if e.threshold else "default",
                 ", ".join(opts))
@@ -225,6 +244,19 @@ class App:
             if e.kind == KIND_BUFF:
                 self.library.update(e.id, pinned=not e.pinned)
         self.refresh_tree()
+
+    def set_autokey(self):
+        sel = [e for e in self._selected() if e.kind == KIND_BUFF]
+        if len(sel) != 1:
+            messagebox.showinfo("BuffWatch", "Select one buff first.", parent=self.root)
+            return
+        e = sel[0]
+
+        def done(key, interval, max_presses):
+            self.library.update(e.id, key=key, key_interval=interval, key_max=max_presses)
+            self.refresh_tree()
+
+        AutoKeyDialog(self.root, e, done)
 
     def toggle_alert(self):
         for e in self._selected():
@@ -522,6 +554,60 @@ class App:
         ttk.Button(f, text="Apply", command=self._settings_changed).grid(
             row=len(rows) + 5, column=0, sticky="w", pady=8)
 
+    # ------------------------------------------------------------ auto-press tab
+    def _build_autokey_tab(self):
+        f = ttk.Frame(self.nb, padding=8)
+        self.nb.add(f, text="Auto-press")
+        ak = self.settings["autokey"]
+        ttk.Label(f, wraplength=700, justify="left", text=(
+            "Give a buff a key (Buffs tab > Auto-press key...) and BuffWatch taps that key "
+            "when the buff runs out, every few seconds, until the buff shows up again. It "
+            "gives up after the set number of presses (out of energy, menu open...) and "
+            "tries again only after it has seen the buff once more.")).grid(
+            row=0, column=0, columnspan=3, sticky="w")
+        ttk.Label(f, wraplength=700, justify="left", foreground="#9a4b00", text=(
+            "This sends simulated key presses to the game, like AutoHotkey does. That is "
+            "automation, so Digital Extremes' rules on macros apply. Use it at your own "
+            "risk. Nothing is pressed unless you assign a key to a buff.")).grid(
+            row=1, column=0, columnspan=3, sticky="w", pady=(6, 10))
+        self.ak_enabled = tk.BooleanVar(value=ak["enabled"])
+        ttk.Checkbutton(f, text="Auto-press on", variable=self.ak_enabled,
+                        command=self._autokey_changed).grid(row=2, column=0, sticky="w")
+        self.ak_focus = tk.BooleanVar(value=ak["only_when_focused"])
+        ttk.Checkbutton(f, text="Only press while the game window is focused (title contains "
+                                "the window title from the Capture box, default 'Warframe')",
+                        variable=self.ak_focus, command=self._autokey_changed).grid(
+            row=3, column=0, columnspan=3, sticky="w", pady=2)
+        ttk.Label(f, text="On/off hotkey (works in game):").grid(row=4, column=0, sticky="w", pady=6)
+        self.ak_hotkey = KeyEntry(f, ak["toggle_hotkey"], on_change=self._hotkey_changed)
+        self.ak_hotkey.grid(row=4, column=1, sticky="w")
+        self.ak_hotkey_msg = ttk.Label(f, foreground="#666")
+        self.ak_hotkey_msg.grid(row=4, column=2, sticky="w", padx=8)
+
+    def _autokey_changed(self):
+        ak = self.settings["autokey"]
+        ak["enabled"] = bool(self.ak_enabled.get())
+        ak["only_when_focused"] = bool(self.ak_focus.get())
+        self.save_settings()
+
+    def _hotkey_changed(self, spec):
+        self.settings["autokey"]["toggle_hotkey"] = spec
+        self.save_settings()
+        self._start_hotkey()
+
+    def _start_hotkey(self):
+        if self.hotkey is not None:
+            self.hotkey.stop()
+            self.hotkey = None
+        spec = self.settings["autokey"].get("toggle_hotkey")
+        if not spec:
+            self.ak_hotkey_msg.configure(text="no hotkey")
+            return
+        self.hotkey = keys.HotkeyListener(spec, self.hotkey_events)
+        err = self.hotkey.start_and_wait()
+        self.ak_hotkey_msg.configure(text=err or "press %s in game to switch auto-press on/off"
+                                     % spec.upper(), foreground="#b00020" if err else "#666")
+
     def _settings_changed(self):
         s = self.settings
         for k, v in self.set_vars.items():
@@ -597,6 +683,15 @@ class App:
         except queue.Empty:
             pass
         now = time.monotonic()
+        try:
+            while True:
+                self.hotkey_events.get_nowait()
+                self.autokey.toggle()
+                self.ak_enabled.set(self.autokey.enabled)
+                self.save_settings()
+                self.flash_status("Auto-press " + ("ON" if self.autokey.enabled else "OFF"))
+        except queue.Empty:
+            pass
         if recognised or learned:
             self._apply_catalog_events(recognised, learned)
         if res is not None:
@@ -604,6 +699,8 @@ class App:
                 self.status.configure(text=res.error, foreground="#b00020")
             else:
                 self.result = res
+                self.autokey_status = self.autokey.update(
+                    self.library.snapshot()[0], set(res.present), now)
                 flash = getattr(self, "_flash", None)
                 if flash and now < flash[1]:
                     self.status.configure(text=flash[0], foreground="#0a7a20")
@@ -621,7 +718,8 @@ class App:
                 if now - self._last_tree > 0.3:
                     self._last_tree = now
                     self._update_tree_status()
-        self.overlay.show(self.result, len(self.unknowns), now)
+        self.overlay.show(self.result, len(self.unknowns), now, self.autokey_status,
+                          self.autokey.enabled)
         self.root.after(40, self._poll)
 
     def _apply_catalog_events(self, recognised, learned):
@@ -660,10 +758,15 @@ class App:
 
     def run(self):
         self.worker.start()
+        self.sender.start()
+        self._start_hotkey()
         self.root.after(100, self._poll)
         self.root.mainloop()
 
     def quit(self):
         self.worker.stop()
+        self.sender.stop()
+        if self.hotkey is not None:
+            self.hotkey.stop()
         self.save_settings()
         self.root.destroy()
