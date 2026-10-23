@@ -7,6 +7,7 @@ import time
 
 from .capture import CaptureError, ImageSource, ScreenSource
 from .detector import Detector
+from .skills import SkillWatcher
 
 
 class Result:
@@ -20,6 +21,8 @@ class Result:
         self.present = {}  # entry_id -> Detection (latest box) for buffs currently up
         self.present_fast = set()  # same, with auto-press's shorter miss_frames
         self.scores = {}  # entry_id -> best score this frame
+        self.skill_roi = None  # BGR image of the ability slots (None = skills off)
+        self.skills = []  # skills.SlotState per slot
         self.error = None
         self.fps = 0.0
 
@@ -32,6 +35,7 @@ class Worker(threading.Thread):
         self.image_path = image_path
         self.detector = Detector(settings)
         self.detector.catalog = catalog
+        self.skills = SkillWatcher(settings)
         self.lock = threading.Lock()  # guards self.detector
         self.results = queue.Queue(maxsize=2)
         self.running = threading.Event()
@@ -40,6 +44,9 @@ class Worker(threading.Thread):
 
     def stop(self):
         self._stop.set()
+
+    def capture_skill_icons(self):
+        self.skills.request_capture()
 
     def resolve_unknown(self, uid):
         with self.lock:
@@ -96,6 +103,12 @@ class Worker(threading.Thread):
                             res.present[e.id] = self.detector.last_det[e.id]
                         if self.detector.is_present(e.id, ak_miss):
                             res.present_fast.add(e.id)
+                sk = self.settings["skills"]
+                if sk["enabled"]:
+                    sroi, _ = source.grab_roi(sk["roi"])
+                    miss_s = (int(sk["miss_frames"]) + 0.5) * period
+                    res.skills = self.skills.process(sroi, cap_h, time.monotonic(), miss_s)
+                    res.skill_roi = sroi
                 res.roi, res.capture_h = roi, cap_h
                 res.detections, res.new_unknowns = dets, new
                 for d in dets:
@@ -115,3 +128,4 @@ class Worker(threading.Thread):
             self._stop.wait(max(0.005, spare) if not res.error else 1.0)
         if source is not None:
             source.close()
+        self.skills.reader.save(force=True)

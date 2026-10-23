@@ -155,16 +155,21 @@ class Sender(threading.Thread):
         self.jobs = queue.Queue()
         self.tap_fn = tap_fn
 
-    def press(self, spec):
-        self.jobs.put(spec)
+    def press(self, spec, hold=None):
+        """Queue a tap of `spec`; `hold` = seconds to keep it down (default 0.05)."""
+        self.jobs.put((spec, hold))
 
     def run(self):
         while True:
-            spec = self.jobs.get()
-            if spec is None:
+            job = self.jobs.get()
+            if job is None:
                 return
+            spec, hold = job
             try:
-                self.tap_fn(spec)
+                if hold is None:
+                    self.tap_fn(spec)
+                else:
+                    self.tap_fn(spec, hold)
             except Exception:
                 pass
 

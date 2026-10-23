@@ -15,7 +15,10 @@ from .library import KIND_BUFF, KIND_IGNORE, Library
 from .ui_common import context_crop, thumb, to_photo
 from .ui_dialogs import AutoKeyDialog, BoxPicker, CatalogPicker, KeyEntry, RegionPicker
 from .ui_overlay import Overlay
+from .skills import N_SLOTS, slot_settings
 from .ui_overlay_settings import OverlaySettingsTab
+from .ui_skill_overlay import SkillOverlay
+from .ui_skills_tab import SkillsTab
 from .worker import Worker
 
 GROUP_IID = "group:"  # prefix of the Buffs list's group header rows (entry ids are plain hex)
@@ -47,6 +50,8 @@ class App:
         self.sender = keys.Sender()
         self.autokey = AutoKey(self.settings, self.sender, keys.foreground_title)
         self.autokey_status = {}
+        self.skill_status = {}
+        self._last_skills = 0
         self.hotkey_events = queue.Queue()
         self.hotkey = None
         self.result = None
@@ -66,6 +71,9 @@ class App:
         self._build()
         self.overlay = Overlay(self)
         self.overlay.apply_settings()
+        self.skill_overlay = SkillOverlay(self)
+        self.skill_overlay.refresh_layout()
+        self.skill_overlay.apply_settings()
 
     # ================================================================ layout
     def _build(self):
@@ -96,6 +104,10 @@ class App:
         self._build_library_tab()
         self._build_unknown_tab()
         self._build_overlay_tab()
+        self.skills_tab = SkillsTab(self.nb, self)
+        self.nb.add(self.skills_tab, text="Skills")
+        self.skill_overlay_tab = OverlaySettingsTab(self.nb, self, "skills_overlay")
+        self.nb.add(self.skill_overlay_tab, text="Skills overlay")
         self._build_settings_tab()
         self._build_autokey_tab()
 
@@ -716,8 +728,9 @@ class App:
         self.overlay_tab = OverlaySettingsTab(self.nb, self)
         self.nb.add(self.overlay_tab, text="Overlay")
 
-    def overlay_moved(self):
-        self.overlay_tab.sync_position()
+    def overlay_moved(self, overlay):
+        tab = self.skill_overlay_tab if overlay is self.skill_overlay else self.overlay_tab
+        tab.sync_position()
 
     # ------------------------------------------------------------ settings tab
     def _build_settings_tab(self):
@@ -849,23 +862,32 @@ class App:
         finally:
             src.close()
 
-    def pick_region(self):
-        # Hide our windows for a moment so they are not in the screenshot.
+    def hide_overlays_and(self, then):
+        """Take a full screenshot without our own windows in it, then call then(image)."""
         self.root.withdraw()
         self.overlay.withdraw()
-        self.root.after(350, self._pick_region_grab)
+        self.skill_overlay.withdraw()
+        self.root.after(350, lambda: self._grab_then(then))
 
-    def _pick_region_grab(self):
+    def _grab_then(self, then):
         try:
             full = self._grab_full()
         except (CaptureError, Exception) as ex:
-            self.root.deiconify()
-            self.overlay.apply_settings()
+            self._show_windows()
             messagebox.showerror("BuffWatch", "Capture failed: %s" % ex, parent=self.root)
             return
+        self._show_windows()
+        then(full)
+
+    def _show_windows(self):
         self.root.deiconify()
         self.overlay.apply_settings()
+        self.skill_overlay.apply_settings()
 
+    def pick_region(self):
+        self.hide_overlays_and(self._pick_region_grab)
+
+    def _pick_region_grab(self, full):
         def done(roi):
             self.settings["roi"] = roi
             self.save_settings()
@@ -914,6 +936,9 @@ class App:
                 self.result = res
                 self.autokey_status = self.autokey.update(
                     self.library.snapshot()[0], res.present_fast, now)
+                self.skill_status = self.autokey.update_skills(
+                    [slot_settings(self.settings, i) for i in range(N_SLOTS)],
+                    res.skills, now) if res.skills else {}
                 flash = getattr(self, "_flash", None)
                 if flash and now < flash[1]:
                     self.status.configure(text=flash[0], foreground="#0a7a20")
@@ -931,8 +956,12 @@ class App:
                 if now - self._last_tree > 0.3:
                     self._last_tree = now
                     self._update_tree_status()
+                if now - self._last_skills > 0.25:
+                    self._last_skills = now
+                    self.skills_tab.refresh(res, self.skill_status)
         self.overlay.show(self.result, len(self.unknowns), now, self.autokey_status,
                           self.autokey.enabled)
+        self.skill_overlay.show(self.result, now, self.skill_status, self.autokey.enabled)
         self.root.after(40, self._poll)
 
     def _apply_catalog_events(self, recognised, learned):
@@ -978,6 +1007,7 @@ class App:
 
     def quit(self):
         self.worker.stop()
+        self.worker.skills.reader.save(force=True)
         self.sender.stop()
         if self.hotkey is not None:
             self.hotkey.stop()
