@@ -60,7 +60,9 @@ What happens in game:
 - It starts only after BuffWatch has seen the buff **active** at least once. A buff you
   never cast doesn't trigger anything.
 - When the buff disappears, the key is tapped right away, then every *interval* until the
-  buff shows up again. The overlay shows `pressing 4 (2/5)` under the buff.
+  buff shows up again. "Right away" means after one missed scan (about 0.1s at 8 scans/s);
+  the overlay waits longer before greying a buff out, to hide flicker. The *Auto-press* tab
+  sets how many scans auto-press waits. The overlay shows `pressing 4 (2/5)` under the buff.
 - After the maximum number of presses it gives up (out of energy, in a menu, ability
   blocked...). It re-arms once it sees the buff again.
 - By default it only presses while the **Warframe window is focused**, so alt-tabbing to

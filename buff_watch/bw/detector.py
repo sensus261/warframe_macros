@@ -190,9 +190,11 @@ class Detector:
             new = self._discover(roi, feats["white"], kept, capture_h)
         return kept, new
 
-    def is_present(self, entry_id):
+    def is_present(self, entry_id, miss_frames=None):
         seen = self.last_seen.get(entry_id)
-        return seen is not None and self._frame_no - seen <= self.settings["miss_frames"]
+        if miss_frames is None:
+            miss_frames = self.settings["miss_frames"]
+        return seen is not None and self._frame_no - seen <= miss_frames
 
     # ------------------------------------------------------------ discovery
     def candidates(self, white, capture_h):
