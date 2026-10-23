@@ -88,7 +88,9 @@ DEFAULTS = {
         "font_size": 9,
         "font_bold": True,
         "text_color": "#e8e8e8",
-        "off_text_color": "#8a8a8a",
+        "off_text_color": "#c8c8c8",
+        "name_width": 0,  # pixels a name may take before it wraps, 0 = automatic
+        "name_lines": 2,  # lines a name may wrap onto before it is cut short
         "alert_color": "#ff5050",  # text and border of an off buff set to alert
         "flash_color": "#ffd400",  # border flash when a buff turns on or off
         "flash_seconds": 0.6,
@@ -149,6 +151,12 @@ def load_settings():
         pass
     if not isinstance(data, dict):
         data = {}
+    # The old default off-text grey was too dark to read over the game; move anyone
+    # still on it to the new one.
+    for key in ("overlay", "skills_overlay"):
+        sec = data.get(key)
+        if isinstance(sec, dict) and sec.get("off_text_color") == "#8a8a8a":
+            sec["off_text_color"] = DEFAULTS["overlay"]["off_text_color"]
     return _merge(DEFAULTS, data)
 
 

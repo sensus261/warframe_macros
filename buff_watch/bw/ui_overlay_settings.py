@@ -14,7 +14,7 @@ NAME_POSITIONS = {"below": "below the icon", "right": "beside the icon"}
 KEEP_ON_RESET = ("visible", "click_through", "hide_from_capture", "x", "y", "anchor")
 # Changing one of these rebuilds the overlay's cells.
 REBUILD = ("orientation", "columns", "cell_gap", "cell_padding", "border_width",
-           "name_position", "font_family", "font_size", "font_bold", "cell_color",
+           "name_position", "name_width", "name_lines", "font_family", "font_size", "font_bold", "cell_color",
            "solid_background", "background_color", "text_color")
 
 
@@ -94,6 +94,8 @@ class OverlaySettingsTab(_Scrolled):
         self._combo(g, "font_family", "Font", families, readonly=False)
         self._spin(g, "font_size", "Size", 6, 40, 1, int)
         self._check(g, "font_bold", "Bold")
+        self._spin(g, "name_width", "Name width (px, 0 = automatic)", 0, 600, 10, int)
+        self._spin(g, "name_lines", "Lines a name may wrap onto", 1, 4, 1, int)
         self._combo(g, "name_position", "Name position", tuple(NAME_POSITIONS.values()),
                     labels=NAME_POSITIONS)
         self._color(g, "text_color", "Name colour (buff on)")

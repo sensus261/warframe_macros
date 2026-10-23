@@ -23,15 +23,17 @@ def thumb(bgr, size):
     return out
 
 
-def context_crop(img, box, out_w=None, out_h=None):
+def context_crop(img, box, out_w=None, out_h=None, fill=(0, 0, 0)):
     """The icon plus the number printed under it, on a fixed-size canvas so the
-    result does not change size when the icon is near the edge of the ROI."""
+    result does not change size when the icon is near the edge of the ROI. Canvas
+    outside `img` is painted `fill` (BGR)."""
     x, y, w, h = box
     cw = out_w or int(w * 1.8)
     ch = out_h or int(h * 2.1)
     x0 = int(x + w / 2 - cw / 2)
     y0 = int(y - h * 0.15)
-    out = np.zeros((ch, cw, 3), np.uint8)
+    out = np.empty((ch, cw, 3), np.uint8)
+    out[:] = fill
     H, W = img.shape[:2]
     sx0, sy0 = max(0, x0), max(0, y0)
     sx1, sy1 = min(W, x0 + cw), min(H, y0 + ch)
