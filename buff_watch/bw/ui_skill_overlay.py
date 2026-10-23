@@ -8,7 +8,7 @@ import cv2
 
 from .skills import SlotState, active_profile, slot_settings
 from .ui_common import to_photo
-from .ui_overlay import Overlay, _font
+from .ui_overlay import Overlay, _Cell, _font, short_status
 
 
 class _Slot:
@@ -26,6 +26,23 @@ class SkillOverlay(Overlay):
         super().__init__(app)
         self.energy_label = tk.Label(self, padx=6, pady=1)
         self._bind_drag(self.energy_label)
+
+    def _make_cell(self, entry_id, ov):
+        """A cell with the time left in a bigger font above the name and status."""
+        c = _Cell(self.body, entry_id, ov)
+        c.hide_text()
+        bg = ov["cell_color"]
+        col = tk.Frame(c.frame, bg=bg)
+        col.pack(**c._text_pack)
+        c.timer = tk.Label(col, bg=bg, font=_font(ov, bigger=3),
+                           anchor="w" if c.beside else "center")
+        c.timer.pack(side="top", fill="x")
+        c.text.pack_forget()
+        c._text_pack = dict(in_=col, side="top", fill="x")
+        c.text.lift(col)  # a widget packed into a sibling frame must sit above it
+        c.text.configure(anchor="w" if c.beside else "center")
+        c.show_text()
+        return c
 
     def apply_settings(self):
         if not self.app.settings["skills"]["enabled"]:
@@ -76,15 +93,23 @@ class SkillOverlay(Overlay):
             if c.was_present is not None and (not ready) != c.was_present:
                 c.flash_until = now + float(ov["flash_seconds"])
             c.was_present = not ready
-            auto = (status or {}).get(i, "")
+            full = (status or {}).get(i, "")
+            auto = short_status(full)
             lines = [cfg["name"]] if ov["show_names"] else []
-            lines.append(st.label() if st else "unknown")
             if auto:
                 lines.append(auto)
-            self.set_label(c, "\n".join(lines))
-            alert = auto.startswith("gave up")
-            c.text.configure(fg=ov["alert_color"] if alert else (
-                ov["off_text_color"] if ready else ov["text_color"]))
+            timer = st.label() if st else "unknown"
+            if c.timer.cget("text") != timer:
+                c.timer.configure(text=timer)
+            if lines:
+                self.set_label(c, "\n".join(lines))
+            else:
+                c.hide_text()
+            alert = full.startswith("gave up")
+            fg = ov["alert_color"] if alert else (
+                ov["off_text_color"] if ready else ov["text_color"])
+            c.text.configure(fg=fg)
+            c.timer.configure(fg=fg)
             border = ov["flash_color"] if now < c.flash_until else (
                 ov["alert_color"] if alert else ov["cell_color"])
             c.frame.configure(highlightbackground=border)

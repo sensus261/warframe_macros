@@ -1,5 +1,7 @@
 """Always-on-top overlay that shows the pinned buffs magnified."""
 
+import re
+import statistics
 import sys
 import tkinter as tk
 from tkinter import font as tkfont
@@ -14,8 +16,37 @@ ANCHORS = ("top-left", "top-right", "bottom-left", "bottom-right")
 LAYOUTS = ("vertical", "horizontal", "grid")
 
 
-def _font(ov):
-    return (ov["font_family"], int(ov["font_size"]), "bold" if ov["font_bold"] else "normal")
+def _font(ov, bigger=0):
+    return (ov["font_family"], int(ov["font_size"]) + bigger,
+            "bold" if ov["font_bold"] else "normal")
+
+
+def bgr(hex_color):
+    """'#rrggbb' -> (b, g, r) for OpenCV images."""
+    try:
+        h = hex_color.lstrip("#")
+        return int(h[4:6], 16), int(h[2:4], 16), int(h[0:2], 16)
+    except (ValueError, AttributeError):
+        return 0, 0, 0
+
+
+# Auto-press status texts, shortened for the overlays (the main window shows them in full).
+_SHORT = ((r"^pressing \S+ \((\d+/\d+)\)$", r"press \1"),
+          (r"^pressed \S+$", "pressed"),
+          (r"^gave up after .*", "gave up"),
+          (r"^waiting.*", "waiting"),
+          (r"^low energy.*", "low energy"),
+          (r"^game not focused$", "not focused"),
+          (r"^HUD not visible$", "no HUD"),
+          (r"^can't tell if the HUD.*", "HUD unknown"),
+          (r"^auto-press off$", ""))  # the AUTO OFF tag already says so
+
+
+def short_status(text):
+    for pat, rep in _SHORT:
+        if re.match(pat, text or ""):
+            return re.sub(pat, rep, text)
+    return text or ""
 
 
 class _Cell:
@@ -232,35 +263,68 @@ class Overlay(tk.Toplevel):
                 self.cells.pop(cid).frame.destroy()
         for e in pinned:
             if e.id not in self.cells:
-                c = _Cell(self.body, e.id, ov)
-                for w in (c.frame, c.img, c.text):
+                c = self._make_cell(e.id, ov)
+                todo = [c.frame]
+                while todo:
+                    w = todo.pop()
                     self._bind_drag(w)
+                    todo += w.winfo_children()
                 self.cells[e.id] = c
         self.order = ids
         self.visible = None  # force a regrid
 
-    def _fit(self, text, maxw):
-        """`text` with every line cut short with an ellipsis to fit `maxw` pixels."""
+    def _make_cell(self, entry_id, ov):
+        return _Cell(self.body, entry_id, ov)
+
+    def _font_obj(self):
         if self._fontobj is None:
             self._fontobj = tkfont.Font(self, font=_font(self.cfg))
-        f = self._fontobj
-        out = []
-        for line in text.split("\n"):
-            if f.measure(line) > maxw:
-                while line and f.measure(line + "\u2026") > maxw:
-                    line = line[:-1]
-                line = line.rstrip() + "\u2026"
-            out.append(line)
-        return "\n".join(out)
+        return self._fontobj
+
+    def _cut(self, line, maxw):
+        """`line` cut short with an ellipsis to fit `maxw` pixels."""
+        f = self._font_obj()
+        if f.measure(line) <= maxw:
+            return line
+        while line and f.measure(line + "\u2026") > maxw:
+            line = line[:-1]
+        return line.rstrip() + "\u2026"
+
+    def _wrap(self, text, maxw, max_lines):
+        """`text` word-wrapped to `maxw` pixels on at most `max_lines` lines; the last
+        line is cut short if it still does not fit."""
+        f = self._font_obj()
+        lines, cur = [], ""
+        for word in text.split():
+            trial = (cur + " " + word).strip()
+            if f.measure(trial) <= maxw or not cur:
+                cur = trial
+            else:
+                lines.append(cur)
+                cur = word
+        lines.append(cur)
+        if len(lines) > max_lines:
+            lines = lines[:max_lines - 1] + [" ".join(lines[max_lines - 1:])]
+        return [self._cut(line, maxw) for line in lines]
+
+    def name_width(self, c):
+        """Pixels a line of text may take in cell `c`."""
+        ov = self.cfg
+        if int(ov.get("name_width") or 0) > 0:
+            return int(ov["name_width"])
+        auto = int(ov["font_size"]) * 11
+        if c.beside:
+            return max(90, auto)
+        return max(auto, c.photo.width() if c.photo is not None else 0)
 
     def set_label(self, c, text):
-        """Show `text` under (or beside) the cell's image, shortened to keep cells tidy."""
+        """Show `text` under (or beside) the cell's image. The first line (the name)
+        wraps onto up to `name_lines` lines; the other lines are cut short."""
         ov = self.cfg
-        if c.beside:
-            maxw = max(80, int(ov["font_size"]) * 11)
-        else:
-            maxw = max(48, c.photo.width() if c.photo is not None else 0)
-        text = self._fit(text, maxw)
+        maxw = self.name_width(c)
+        first, *rest = text.split("\n")
+        lines = self._wrap(first, maxw, max(1, int(ov.get("name_lines") or 2)))
+        text = "\n".join(lines + [self._cut(r, maxw) for r in rest])
         if c.text.cget("text") != text:
             c.text.configure(text=text)
         c.show_text()
@@ -322,6 +386,9 @@ class Overlay(tk.Toplevel):
         self._sync_cells(entries)
         zoom = float(ov["zoom"])
         dim = max(0.0, min(1.0, float(ov["dim_missing"])))
+        fill = bgr(ov["cell_color"])
+        # Every icon is shown at the same size, whatever size its saved image is.
+        ref_h = statistics.median(e.image.shape[0] for e in entries) if entries else 1
         visible = []
         for e in entries:
             c = self.cells[e.id]
@@ -330,10 +397,10 @@ class Overlay(tk.Toplevel):
             det = result.present.get(e.id) if result is not None else None
             present = det is not None and result.roi is not None
             if present:
-                img = context_crop(result.roi, det.box, cw, ch)
+                img = context_crop(result.roi, det.box, cw, ch, fill)
             elif ov["show_missing"]:
-                img = cv2.convertScaleAbs(context_crop(e.image, (0, 0, tw, th), cw, ch),
-                                          alpha=dim)
+                img = context_crop(cv2.convertScaleAbs(e.image, alpha=dim), (0, 0, tw, th),
+                                   cw, ch, fill)
             else:
                 img = None
             if c.was_present is not None and present != c.was_present:
@@ -342,9 +409,9 @@ class Overlay(tk.Toplevel):
             if img is None:
                 continue
             visible.append(e.id)
-            c.photo = to_photo(img, zoom, cv2.INTER_LINEAR)
+            c.photo = to_photo(img, zoom * ref_h / th, cv2.INTER_LINEAR)
             c.img.configure(image=c.photo)
-            auto = (autokey_status or {}).get(e.id) if not present else None
+            auto = short_status((autokey_status or {}).get(e.id)) if not present else None
             lines = ([e.name] if ov["show_names"] else []) + ([auto] if auto else [])
             if lines:
                 self.set_label(c, "\n".join(lines))

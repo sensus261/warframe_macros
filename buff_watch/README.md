@@ -167,7 +167,7 @@ other windows on top of exclusive fullscreen, and capturing it may give a black 
    zoom, open settings) and turn the mouse wheel over it to zoom. An unlocked overlay with
    nothing to show appears as a small "(empty)" label so you can still find it. A small
    *AUTO OFF* tag in its corner means auto-press is switched off. The tab also sets the zoom, a vertical, horizontal or grid layout, spacing, font,
-   name position, colours, opacity and how dim off buffs look. Every change shows at once.
+   name position, how wide a name may be and how many lines it may wrap onto, colours, opacity and how dim off buffs look. Every change shows at once.
    **Corner that stays put** decides which corner of the overlay keeps its place while buffs
    come and go: pick bottom-right for an overlay in the bottom-right of the screen.
 
