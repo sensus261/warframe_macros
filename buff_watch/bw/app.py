@@ -1,0 +1,558 @@
+"""Main window: source/region setup, live preview, buff library and unknown-icon queue."""
+
+import queue
+import time
+import tkinter as tk
+from tkinter import messagebox, simpledialog, ttk
+
+import cv2
+
+from . import config, winutil
+from .capture import CaptureError, ImageSource, ScreenSource, list_monitors
+from .library import KIND_BUFF, KIND_IGNORE, Library
+from .ui_common import context_crop, thumb, to_photo
+from .ui_dialogs import BoxPicker, RegionPicker
+from .ui_overlay import Overlay
+from .worker import Worker
+
+PREVIEW_W = 760
+
+
+class App:
+    def __init__(self, image_path=None):
+        winutil.enable_dpi_awareness()
+        self.image_path = image_path
+        self.settings = config.load_settings()
+        self.library = Library()
+        self.library.load()
+        self.worker = Worker(self.settings, self.library, image_path)
+        self.result = None
+        self.unknowns = []
+        self.unknown_idx = 0
+        self._thumbs = {}
+        self._last_tree = 0
+        self._last_preview = 0
+
+        self.root = tk.Tk()
+        self.root.title("BuffWatch")
+        self.root.minsize(780, 560)
+        self.root.protocol("WM_DELETE_WINDOW", self.quit)
+        style = ttk.Style(self.root)
+        style.configure("Treeview", rowheight=36)
+        self._build()
+        self.overlay = Overlay(self)
+        self.overlay.apply_settings()
+
+    # ================================================================ layout
+    def _build(self):
+        r = self.root
+        top = ttk.Frame(r, padding=6)
+        top.pack(fill="x")
+        ttk.Label(top, text="Capture:").pack(side="left")
+        self.source_var = tk.StringVar()
+        self.source_box = ttk.Combobox(top, textvariable=self.source_var, width=34,
+                                       state="readonly")
+        self.source_box.pack(side="left", padx=4)
+        self.source_box.bind("<<ComboboxSelected>>", self._source_changed)
+        self.source_box.bind("<Button-1>", lambda e: self._fill_sources())
+        ttk.Button(top, text="Select buff area...", command=self.pick_region).pack(side="left", padx=4)
+        ttk.Button(top, text="Teach icon...", command=self.teach).pack(side="left", padx=4)
+        self.pause_var = tk.BooleanVar(value=False)
+        ttk.Checkbutton(top, text="Pause", variable=self.pause_var,
+                        command=self._pause_changed).pack(side="left", padx=8)
+        self.status = ttk.Label(top, text="starting...", foreground="#666")
+        self.status.pack(side="right")
+        self._fill_sources()
+
+        self.preview = ttk.Label(r, anchor="center", background="black")
+        self.preview.pack(fill="x", padx=6)
+
+        self.nb = ttk.Notebook(r)
+        self.nb.pack(fill="both", expand=True, padx=6, pady=6)
+        self._build_library_tab()
+        self._build_unknown_tab()
+        self._build_overlay_tab()
+        self._build_settings_tab()
+
+    def _fill_sources(self):
+        opts = []
+        try:
+            for i, m in list_monitors():
+                opts.append("Monitor %d (%dx%d)" % (i, m["width"], m["height"]))
+        except Exception:
+            pass
+        opts.append("Window: " + self.settings["source"].get("window_title", "Warframe"))
+        self.source_box["values"] = opts
+        src = self.settings["source"]
+        if self.image_path:
+            self.source_var.set("Test image: " + self.image_path)
+            self.source_box.configure(state="disabled")
+        elif src["kind"] == "window":
+            self.source_var.set(opts[-1])
+        else:
+            cur = [o for o in opts if o.startswith("Monitor %d " % src["monitor"])]
+            self.source_var.set(cur[0] if cur else opts[0])
+
+    def _source_changed(self, _ev=None):
+        v = self.source_var.get()
+        src = dict(self.settings["source"])
+        if v.startswith("Window"):
+            title = simpledialog.askstring(
+                "BuffWatch", "Capture the window whose title contains:",
+                initialvalue=src.get("window_title", "Warframe"), parent=self.root)
+            if not title:
+                self._fill_sources()
+                return
+            src.update(kind="window", window_title=title)
+        else:
+            src.update(kind="monitor", monitor=int(v.split()[1]))
+        self.settings["source"] = src
+        self.save_settings()
+        self._fill_sources()
+
+    def _pause_changed(self):
+        if self.pause_var.get():
+            self.worker.running.clear()
+        else:
+            self.worker.running.set()
+
+    # ------------------------------------------------------------ library tab
+    def _build_library_tab(self):
+        f = ttk.Frame(self.nb, padding=4)
+        self.nb.add(f, text="Buffs")
+        cols = ("pin", "name", "status", "score", "thr", "opts")
+        self.tree = ttk.Treeview(f, columns=cols, height=8, selectmode="extended")
+        self.tree.heading("#0", text="Icon")
+        self.tree.column("#0", width=60, stretch=False)
+        for c, t, w in (("pin", "Overlay", 64), ("name", "Name", 220), ("status", "Status", 80),
+                        ("score", "Match", 60), ("thr", "Threshold", 72), ("opts", "Options", 170)):
+            self.tree.heading(c, text=t)
+            self.tree.column(c, width=w, stretch=c == "name",
+                             anchor="w" if c in ("name", "opts") else "center")
+        self.tree.tag_configure("on", foreground="#0a7a20")
+        self.tree.tag_configure("ignored", foreground="#999")
+        sb = ttk.Scrollbar(f, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=sb.set)
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        sb.grid(row=0, column=1, sticky="ns")
+        self.tree.bind("<Double-1>", lambda e: self.toggle_pin())
+        f.rowconfigure(0, weight=1)
+        f.columnconfigure(0, weight=1)
+
+        bar = ttk.Frame(f)
+        bar.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(6, 0))
+        for text, cmd in (("Show / hide in overlay", self.toggle_pin),
+                          ("Rename", self.rename), ("Threshold...", self.set_threshold),
+                          ("Warn when missing", self.toggle_alert),
+                          ("Coloured icon", self.toggle_mode),
+                          ("Up", lambda: self.move(-1)), ("Down", lambda: self.move(1)),
+                          ("Delete", self.delete)):
+            ttk.Button(bar, text=text, command=cmd).pack(side="left", padx=2)
+        self.show_ignored = tk.BooleanVar(value=False)
+        ttk.Checkbutton(bar, text="Show ignored", variable=self.show_ignored,
+                        command=self.refresh_tree).pack(side="right")
+        ttk.Label(f, foreground="#666", text=(
+            "Double-click a row to show/hide it in the overlay. Select several rows with "
+            "Ctrl/Shift. 'Coloured icon' matches in grayscale instead of white-only "
+            "(use it for icons that are not white).")).grid(
+            row=2, column=0, columnspan=2, sticky="w", pady=(4, 0))
+        self.refresh_tree()
+
+    def _selected(self):
+        return [self.library.get(i) for i in self.tree.selection() if self.library.get(i)]
+
+    def refresh_tree(self):
+        sel = set(self.tree.selection())
+        self.tree.delete(*self.tree.get_children())
+        for e in self.library.snapshot()[0]:
+            if e.kind == KIND_IGNORE and not self.show_ignored.get():
+                continue
+            if e.id not in self._thumbs:
+                self._thumbs[e.id] = to_photo(thumb(e.image, 32))
+            self.tree.insert("", "end", iid=e.id, image=self._thumbs[e.id],
+                             values=self._row_values(e),
+                             tags=("ignored",) if e.kind == KIND_IGNORE else ())
+        keep = [i for i in sel if self.tree.exists(i)]
+        if keep:
+            self.tree.selection_set(keep)
+        self._last_tree = 0
+
+    def _row_values(self, e, present=False, score=None):
+        opts = []
+        if e.kind == KIND_IGNORE:
+            opts.append("ignored")
+        if e.alert_missing:
+            opts.append("warn when missing")
+        if e.mode == "gray":
+            opts.append("coloured")
+        return ("yes" if e.pinned else "",
+                e.name,
+                "ACTIVE" if present else "-",
+                "%.2f" % score if score else "",
+                "%.2f" % e.threshold if e.threshold else "default",
+                ", ".join(opts))
+
+    def _update_tree_status(self):
+        res = self.result
+        for e in self.library.snapshot()[0]:
+            if not self.tree.exists(e.id):
+                continue
+            present = res is not None and e.id in res.present
+            score = res.scores.get(e.id) if res is not None else None
+            self.tree.item(e.id, values=self._row_values(e, present, score),
+                           tags=("on",) if present else (
+                               ("ignored",) if e.kind == KIND_IGNORE else ()))
+
+    def toggle_pin(self):
+        for e in self._selected():
+            if e.kind == KIND_BUFF:
+                self.library.update(e.id, pinned=not e.pinned)
+        self.refresh_tree()
+
+    def toggle_alert(self):
+        for e in self._selected():
+            self.library.update(e.id, alert_missing=not e.alert_missing)
+        self.refresh_tree()
+
+    def toggle_mode(self):
+        for e in self._selected():
+            self.library.update(e.id, mode="white" if e.mode == "gray" else "gray")
+        self.refresh_tree()
+
+    def rename(self):
+        sel = self._selected()
+        if len(sel) != 1:
+            return
+        name = simpledialog.askstring("BuffWatch", "Name:", initialvalue=sel[0].name,
+                                      parent=self.root)
+        if name and name.strip():
+            self.library.update(sel[0].id, name=name.strip())
+            self.refresh_tree()
+
+    def set_threshold(self):
+        sel = self._selected()
+        if not sel:
+            return
+        v = simpledialog.askfloat(
+            "BuffWatch", "Match threshold 0.30 - 0.99 (lower = finds it more easily but "
+                         "may confuse it with similar icons). 0 = use the default.",
+            initialvalue=sel[0].threshold or self.settings["match_threshold"],
+            minvalue=0.0, maxvalue=0.99, parent=self.root)
+        if v is None:
+            return
+        for e in sel:
+            self.library.update(e.id, threshold=round(v, 2) if v >= 0.3 else None)
+        self.refresh_tree()
+
+    def move(self, delta):
+        sel = self._selected()
+        for e in (sel if delta < 0 else reversed(sel)):
+            self.library.move(e.id, delta)
+        self.refresh_tree()
+
+    def delete(self):
+        sel = self._selected()
+        if sel and messagebox.askyesno("BuffWatch", "Delete %d icon(s)?" % len(sel),
+                                       parent=self.root):
+            for e in sel:
+                self.library.remove(e.id)
+                self._thumbs.pop(e.id, None)
+            self.refresh_tree()
+
+    # ------------------------------------------------------------ unknown tab
+    def _build_unknown_tab(self):
+        f = ttk.Frame(self.nb, padding=8)
+        self.unknown_tab = f
+        self.nb.add(f, text="New icons")
+        self.unk_title = ttk.Label(f, text="No new icons.", font=("Segoe UI", 11, "bold"))
+        self.unk_title.grid(row=0, column=0, columnspan=3, sticky="w")
+        self.unk_img = ttk.Label(f)
+        self.unk_img.grid(row=1, column=0, rowspan=4, padx=(0, 12), pady=6)
+        self.unk_ctx = ttk.Label(f)
+        self.unk_ctx.grid(row=5, column=0, columnspan=3, sticky="w")
+        ttk.Label(f, text="What is it?").grid(row=1, column=1, sticky="w")
+        self.unk_name = tk.StringVar()
+        self.unk_entry = ttk.Entry(f, textvariable=self.unk_name, width=30)
+        self.unk_entry.grid(row=1, column=2, sticky="w")
+        self.unk_entry.bind("<Return>", lambda e: self.unknown_save(True))
+        b = ttk.Frame(f)
+        b.grid(row=2, column=1, columnspan=2, sticky="w", pady=4)
+        ttk.Button(b, text="Save + show in overlay",
+                   command=lambda: self.unknown_save(True)).pack(side="left", padx=2)
+        ttk.Button(b, text="Save", command=lambda: self.unknown_save(False)).pack(side="left", padx=2)
+        ttk.Button(b, text="Fix the box...", command=self.unknown_adjust).pack(side="left", padx=2)
+        b2 = ttk.Frame(f)
+        b2.grid(row=3, column=1, columnspan=2, sticky="w")
+        ttk.Button(b2, text="Not a buff (ignore forever)",
+                   command=self.unknown_ignore).pack(side="left", padx=2)
+        ttk.Button(b2, text="Skip for now", command=self.unknown_skip).pack(side="left", padx=2)
+        ttk.Button(b2, text="< Prev", command=lambda: self.unknown_step(-1)).pack(side="left", padx=(16, 2))
+        ttk.Button(b2, text="Next >", command=lambda: self.unknown_step(1)).pack(side="left", padx=2)
+        ttk.Label(f, foreground="#666", wraplength=520, justify="left", text=(
+            "Icons that BuffWatch sees but does not know yet show up here. Auto-detection "
+            "is a best guess: if the box cuts the icon or grabs the number under it, use "
+            "'Fix the box...'. If nothing gets detected, use 'Teach icon...' at the top.")
+        ).grid(row=4, column=1, columnspan=2, sticky="w", pady=6)
+
+    def _current_unknown(self):
+        if not self.unknowns:
+            return None
+        self.unknown_idx %= len(self.unknowns)
+        return self.unknowns[self.unknown_idx]
+
+    def show_unknown(self):
+        n = len(self.unknowns)
+        self.nb.tab(self.unknown_tab, text="New icons (%d)" % n if n else "New icons")
+        self.root.title("BuffWatch - %d new icon%s" % (n, "" if n == 1 else "s") if n else "BuffWatch")
+        u = self._current_unknown()
+        if u is None:
+            self.unk_title.configure(text="No new icons.")
+            self.unk_img.configure(image="")
+            self.unk_ctx.configure(image="")
+            return
+        self.unk_title.configure(text="New icon %d of %d" % (self.unknown_idx + 1, n))
+        x, y, w, h = u.box
+        self._unk_photo = to_photo(thumb(context_crop(u.frame, u.box), 150))
+        self.unk_img.configure(image=self._unk_photo)
+        ctx = u.frame.copy()
+        cv2.rectangle(ctx, (x - 1, y - 1), (x + w, y + h), (0, 220, 255), 1)
+        s = min(2.0, PREVIEW_W / ctx.shape[1])
+        self._unk_ctx_photo = to_photo(ctx, s, cv2.INTER_LINEAR)
+        self.unk_ctx.configure(image=self._unk_ctx_photo)
+        self.unk_name.set("")
+
+    def unknown_step(self, d):
+        self.unknown_idx += d
+        self.show_unknown()
+
+    def _drop_unknown(self, u):
+        self.worker.resolve_unknown(u.uid)
+        self.unknowns = [x for x in self.unknowns if x.uid != u.uid]
+        self.show_unknown()
+
+    def unknown_save(self, pin):
+        u = self._current_unknown()
+        name = self.unk_name.get().strip()
+        if u is None:
+            return
+        if not name:
+            self.unk_entry.focus_set()
+            return
+        self.library.add(name, u.crop, KIND_BUFF, pinned=pin)
+        self._drop_unknown(u)
+        self.refresh_tree()
+
+    def unknown_ignore(self):
+        u = self._current_unknown()
+        if u is not None:
+            self.library.add("(ignored)", u.crop, KIND_IGNORE)
+            self._drop_unknown(u)
+            self.refresh_tree()
+
+    def unknown_skip(self):
+        u = self._current_unknown()
+        if u is not None:
+            self._drop_unknown(u)
+
+    def unknown_adjust(self):
+        u = self._current_unknown()
+        if u is None:
+            return
+
+        def done(crop, name, kind, pin):
+            self.library.add(name, crop, kind, pinned=pin)
+            self._drop_unknown(u)
+            self.refresh_tree()
+
+        BoxPicker(self.root, u.frame, done, box=u.box, name=self.unk_name.get().strip())
+
+    # ------------------------------------------------------------ overlay tab
+    def _build_overlay_tab(self):
+        f = ttk.Frame(self.nb, padding=8)
+        self.nb.add(f, text="Overlay")
+        ov = self.settings["overlay"]
+        self.ov_vars = {}
+        row = 0
+        for key, text in (("visible", "Show overlay"),
+                          ("click_through", "Lock overlay (clicks go through to the game)"),
+                          ("show_missing", "Show pinned buffs while they are off (dimmed)"),
+                          ("show_names", "Show buff names"),
+                          ("hide_from_capture", "Hide overlay from screen capture / recordings "
+                                                "(stops BuffWatch reading its own overlay)")):
+            v = tk.BooleanVar(value=ov[key])
+            self.ov_vars[key] = v
+            ttk.Checkbutton(f, text=text, variable=v, command=self._overlay_changed).grid(
+                row=row, column=0, columnspan=2, sticky="w", pady=2)
+            row += 1
+        ttk.Label(f, text="Zoom:").grid(row=row, column=0, sticky="w", pady=4)
+        self.zoom_var = tk.DoubleVar(value=ov["zoom"])
+        ttk.Spinbox(f, from_=1.0, to=8.0, increment=0.5, textvariable=self.zoom_var, width=6,
+                    command=self._overlay_changed).grid(row=row, column=1, sticky="w")
+        row += 1
+        ttk.Label(f, text="Layout:").grid(row=row, column=0, sticky="w")
+        self.orient_var = tk.StringVar(value=ov["orientation"])
+        cb = ttk.Combobox(f, textvariable=self.orient_var, values=("vertical", "horizontal"),
+                          state="readonly", width=12)
+        cb.grid(row=row, column=1, sticky="w")
+        cb.bind("<<ComboboxSelected>>", lambda e: self._overlay_changed())
+        row += 1
+        ttk.Label(f, foreground="#666", wraplength=640, justify="left", text=(
+            "Drag the overlay by its blue bar to move it, then tick 'Lock overlay'. The game "
+            "must run in Borderless Fullscreen or Windowed mode for the overlay to show on top "
+            "of it.")).grid(row=row, column=0, columnspan=2, sticky="w", pady=8)
+
+    def _overlay_changed(self):
+        ov = self.settings["overlay"]
+        for k, v in self.ov_vars.items():
+            ov[k] = bool(v.get())
+        try:
+            ov["zoom"] = max(1.0, min(8.0, float(self.zoom_var.get())))
+        except (tk.TclError, ValueError):
+            pass
+        relayout = ov["orientation"] != self.orient_var.get()
+        ov["orientation"] = self.orient_var.get()
+        self.save_settings()
+        self.overlay.apply_settings()
+        if relayout:
+            self.overlay.refresh_layout()
+
+    # ------------------------------------------------------------ settings tab
+    def _build_settings_tab(self):
+        f = ttk.Frame(self.nb, padding=8)
+        self.nb.add(f, text="Detection")
+        s = self.settings
+        self.set_vars = {}
+        rows = (("match_threshold", "Default match threshold", 0.3, 0.99, 0.01),
+                ("fps", "Scans per second", 1, 30, 1),
+                ("miss_frames", "Frames a buff may be unseen before it counts as off", 0, 30, 1),
+                ("stable_frames", "Frames an unknown icon must stay put before asking", 2, 100, 1))
+        for i, (key, text, lo, hi, step) in enumerate(rows):
+            ttk.Label(f, text=text).grid(row=i, column=0, sticky="w", pady=2)
+            v = tk.DoubleVar(value=s[key])
+            self.set_vars[key] = v
+            ttk.Spinbox(f, from_=lo, to=hi, increment=step, textvariable=v, width=7,
+                        command=self._settings_changed).grid(row=i, column=1, sticky="w", padx=6)
+        self.disc_var = tk.BooleanVar(value=s["discovery"])
+        ttk.Checkbutton(f, text="Detect new icons and ask me to name them", variable=self.disc_var,
+                        command=self._settings_changed).grid(row=len(rows), column=0, sticky="w", pady=4)
+        self.prev_var = tk.BooleanVar(value=s["preview"])
+        ttk.Checkbutton(f, text="Live preview in this window", variable=self.prev_var,
+                        command=self._settings_changed).grid(row=len(rows) + 1, column=0, sticky="w")
+        ttk.Button(f, text="Apply", command=self._settings_changed).grid(
+            row=len(rows) + 2, column=0, sticky="w", pady=8)
+
+    def _settings_changed(self):
+        s = self.settings
+        for k, v in self.set_vars.items():
+            try:
+                val = float(v.get())
+            except (tk.TclError, ValueError):
+                continue
+            s[k] = round(val, 2) if k == "match_threshold" else int(val)
+        s["discovery"] = bool(self.disc_var.get())
+        s["preview"] = bool(self.prev_var.get())
+        self.library.touch()
+        self.save_settings()
+
+    # ================================================================ actions
+    def save_settings(self):
+        config.save_settings(self.settings)
+
+    def _grab_full(self):
+        if self.image_path:
+            return ImageSource(self.image_path).grab_full()
+        src = ScreenSource(self.settings["source"])
+        try:
+            return src.grab_full()
+        finally:
+            src.close()
+
+    def pick_region(self):
+        # Hide our windows for a moment so they are not in the screenshot.
+        self.root.withdraw()
+        self.overlay.withdraw()
+        self.root.after(350, self._pick_region_grab)
+
+    def _pick_region_grab(self):
+        try:
+            full = self._grab_full()
+        except (CaptureError, Exception) as ex:
+            self.root.deiconify()
+            self.overlay.apply_settings()
+            messagebox.showerror("BuffWatch", "Capture failed: %s" % ex, parent=self.root)
+            return
+        self.root.deiconify()
+        self.overlay.apply_settings()
+
+        def done(roi):
+            self.settings["roi"] = roi
+            self.save_settings()
+
+        RegionPicker(self.root, full, self.settings["roi"], done)
+
+    def teach(self):
+        if self.result is None or self.result.roi is None:
+            messagebox.showinfo("BuffWatch", "Nothing captured yet.", parent=self.root)
+            return
+
+        def done(crop, name, kind, pin):
+            self.library.add(name, crop, kind, pinned=pin)
+            self.refresh_tree()
+
+        BoxPicker(self.root, self.result.roi.copy(), done)
+
+    # ================================================================ loop
+    def _poll(self):
+        res = None
+        try:
+            while True:
+                res = self.worker.results.get_nowait()
+        except queue.Empty:
+            pass
+        now = time.monotonic()
+        if res is not None:
+            if res.error:
+                self.status.configure(text=res.error, foreground="#b00020")
+            else:
+                self.result = res
+                self.status.configure(
+                    text="%.1f scans/s - %d active" % (res.fps, len(res.present)),
+                    foreground="#666")
+                if res.new_unknowns:
+                    known = {u.uid for u in self.unknowns}
+                    self.unknowns += [u for u in res.new_unknowns if u.uid not in known]
+                    self.show_unknown()
+                if self.settings["preview"] and now - self._last_preview > 0.12:
+                    self._last_preview = now
+                    self._draw_preview(res)
+                if now - self._last_tree > 0.3:
+                    self._last_tree = now
+                    self._update_tree_status()
+        self.overlay.show(self.result, len(self.unknowns), now)
+        self.root.after(40, self._poll)
+
+    def _draw_preview(self, res):
+        if self.root.state() == "iconic":
+            return
+        img = res.roi.copy()
+        for d in res.detections:
+            col = (80, 220, 80) if d.kind == KIND_BUFF else (120, 120, 120)
+            x, y, w, h = d.box
+            cv2.rectangle(img, (x, y), (x + w - 1, y + h - 1), col, 1)
+        for u in self.unknowns:
+            if u.frame.shape == img.shape:
+                x, y, w, h = u.box
+                cv2.rectangle(img, (x, y), (x + w - 1, y + h - 1), (0, 220, 255), 1)
+        s = min(3.0, PREVIEW_W / img.shape[1], 240 / img.shape[0])
+        self._preview_photo = to_photo(img, s, cv2.INTER_LINEAR)
+        self.preview.configure(image=self._preview_photo)
+
+    def run(self):
+        self.worker.start()
+        self.root.after(100, self._poll)
+        self.root.mainloop()
+
+    def quit(self):
+        self.worker.stop()
+        self.save_settings()
+        self.root.destroy()
