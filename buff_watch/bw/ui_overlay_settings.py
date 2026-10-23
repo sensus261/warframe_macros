@@ -125,7 +125,8 @@ class OverlaySettingsTab(_Scrolled):
         ttk.Button(bottom, text="Reset overlay to defaults",
                    command=self._reset).pack(side="left")
         ttk.Label(f, foreground="#666", wraplength=700, justify="left", text=(
-            "Drag the overlay by its blue bar to move it, then tick 'Lock overlay'. The corner "
+            "Drag the overlay by any of its cells to move it, then tick 'Lock overlay'. While "
+            "unlocked, right-click it for a quick menu and use the mouse wheel to zoom. The corner "
             "that stays put keeps its place while buffs come and go, so pick bottom-right for "
             "an overlay in the bottom-right of the screen. The game must run in Borderless "
             "Fullscreen or Windowed mode for the overlay to show on top of it.")).grid(
@@ -269,6 +270,14 @@ class OverlaySettingsTab(_Scrolled):
             overlay.refresh_layout()
         overlay.place()
         self._update_states()
+
+    def set_value(self, key, val):
+        """Change one setting as if it had been changed in this tab (overlay menu, wheel)."""
+        v, kind = self.vars[key][0], self.vars[key][1]
+        if isinstance(kind, dict):
+            val = kind.get(val, val)
+        v.set(val)
+        self._changed()
 
     def _update_states(self):
         self.columns_spin.configure(

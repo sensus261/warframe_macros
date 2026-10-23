@@ -729,9 +729,16 @@ class App:
         self.overlay_tab = OverlaySettingsTab(self.nb, self)
         self.nb.add(self.overlay_tab, text="Buffs overlay")
 
+    def overlay_tab_for(self, overlay):
+        return self.skill_overlay_tab if overlay is self.skill_overlay else self.overlay_tab
+
     def overlay_moved(self, overlay):
-        tab = self.skill_overlay_tab if overlay is self.skill_overlay else self.overlay_tab
-        tab.sync_position()
+        self.overlay_tab_for(overlay).sync_position()
+
+    def open_overlay_settings(self, overlay):
+        self.root.deiconify()
+        self.root.lift()
+        self.nb.select(self.overlay_tab_for(overlay))
 
     # ------------------------------------------------------------ settings tab
     def _build_settings_tab(self):
