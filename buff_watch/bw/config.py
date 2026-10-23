@@ -50,10 +50,31 @@ DEFAULTS = {
         "visible": True,
         "x": 60,
         "y": 200,
+        # x, y is the screen position of the anchor corner, which stays put while the
+        # overlay grows or shrinks as buffs come and go.
+        "anchor": "top-left",  # top-left, top-right, bottom-left, bottom-right
         "zoom": 3.0,
-        "orientation": "vertical",  # or "horizontal"
+        "orientation": "vertical",  # "horizontal", or "grid" (wraps after `columns`)
+        "columns": 3,
+        "cell_gap": 4,  # pixels between cells
+        "cell_padding": 2,  # pixels between a cell's border and its content
+        "border_width": 2,  # alert / flash border, 0 hides it
         "show_missing": True,
         "show_names": True,
+        "name_position": "below",  # or "right"
+        "font_family": "Segoe UI",
+        "font_size": 10,
+        "font_bold": True,
+        "text_color": "#e8e8e8",
+        "off_text_color": "#8a8a8a",
+        "alert_color": "#ff5050",  # text and border of an off buff set to alert
+        "flash_color": "#ffd400",  # border flash when a buff turns on or off
+        "flash_seconds": 0.6,
+        "cell_color": "#101014",
+        "solid_background": False,  # fill the gaps between cells instead of see-through
+        "background_color": "#101014",
+        "opacity": 1.0,
+        "dim_missing": 0.33,  # brightness of a buff's icon while it is off
         "click_through": False,
         "hide_from_capture": True,
     },

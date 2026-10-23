@@ -15,6 +15,7 @@ from .library import KIND_BUFF, KIND_IGNORE, Library
 from .ui_common import context_crop, thumb, to_photo
 from .ui_dialogs import AutoKeyDialog, BoxPicker, CatalogPicker, KeyEntry, RegionPicker
 from .ui_overlay import Overlay
+from .ui_overlay_settings import OverlaySettingsTab
 from .worker import Worker
 
 PREVIEW_W = 760
@@ -529,53 +530,11 @@ class App:
 
     # ------------------------------------------------------------ overlay tab
     def _build_overlay_tab(self):
-        f = ttk.Frame(self.nb, padding=8)
-        self.nb.add(f, text="Overlay")
-        ov = self.settings["overlay"]
-        self.ov_vars = {}
-        row = 0
-        for key, text in (("visible", "Show overlay"),
-                          ("click_through", "Lock overlay (clicks go through to the game)"),
-                          ("show_missing", "Show pinned buffs while they are off (dimmed)"),
-                          ("show_names", "Show buff names"),
-                          ("hide_from_capture", "Hide overlay from screen capture / recordings "
-                                                "(stops BuffWatch reading its own overlay)")):
-            v = tk.BooleanVar(value=ov[key])
-            self.ov_vars[key] = v
-            ttk.Checkbutton(f, text=text, variable=v, command=self._overlay_changed).grid(
-                row=row, column=0, columnspan=2, sticky="w", pady=2)
-            row += 1
-        ttk.Label(f, text="Zoom:").grid(row=row, column=0, sticky="w", pady=4)
-        self.zoom_var = tk.DoubleVar(value=ov["zoom"])
-        ttk.Spinbox(f, from_=1.0, to=8.0, increment=0.5, textvariable=self.zoom_var, width=6,
-                    command=self._overlay_changed).grid(row=row, column=1, sticky="w")
-        row += 1
-        ttk.Label(f, text="Layout:").grid(row=row, column=0, sticky="w")
-        self.orient_var = tk.StringVar(value=ov["orientation"])
-        cb = ttk.Combobox(f, textvariable=self.orient_var, values=("vertical", "horizontal"),
-                          state="readonly", width=12)
-        cb.grid(row=row, column=1, sticky="w")
-        cb.bind("<<ComboboxSelected>>", lambda e: self._overlay_changed())
-        row += 1
-        ttk.Label(f, foreground="#666", wraplength=640, justify="left", text=(
-            "Drag the overlay by its blue bar to move it, then tick 'Lock overlay'. The game "
-            "must run in Borderless Fullscreen or Windowed mode for the overlay to show on top "
-            "of it.")).grid(row=row, column=0, columnspan=2, sticky="w", pady=8)
+        self.overlay_tab = OverlaySettingsTab(self.nb, self)
+        self.nb.add(self.overlay_tab, text="Overlay")
 
-    def _overlay_changed(self):
-        ov = self.settings["overlay"]
-        for k, v in self.ov_vars.items():
-            ov[k] = bool(v.get())
-        try:
-            ov["zoom"] = max(1.0, min(8.0, float(self.zoom_var.get())))
-        except (tk.TclError, ValueError):
-            pass
-        relayout = ov["orientation"] != self.orient_var.get()
-        ov["orientation"] = self.orient_var.get()
-        self.save_settings()
-        self.overlay.apply_settings()
-        if relayout:
-            self.overlay.refresh_layout()
+    def overlay_moved(self):
+        self.overlay_tab.sync_position()
 
     # ------------------------------------------------------------ settings tab
     def _build_settings_tab(self):
