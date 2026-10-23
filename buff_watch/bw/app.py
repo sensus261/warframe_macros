@@ -785,11 +785,22 @@ class App:
         self.ak_hotkey.grid(row=4, column=1, sticky="w")
         self.ak_hotkey_msg = ttk.Label(f, foreground="#666")
         self.ak_hotkey_msg.grid(row=4, column=2, sticky="w", padx=8)
+        ttk.Label(f, text="Frames a buff may be unseen before pressing:").grid(
+            row=5, column=0, sticky="w", pady=2)
+        self.ak_miss = tk.IntVar(value=ak["miss_frames"])
+        ttk.Spinbox(f, from_=0, to=30, increment=1, textvariable=self.ak_miss, width=7,
+                    command=self._autokey_changed).grid(row=5, column=1, sticky="w")
+        ttk.Label(f, foreground="#666", text="0-1 = press right away, higher = ignore "
+                  "detection flicker").grid(row=5, column=2, sticky="w", padx=8)
 
     def _autokey_changed(self):
         ak = self.settings["autokey"]
         ak["enabled"] = bool(self.ak_enabled.get())
         ak["only_when_focused"] = bool(self.ak_focus.get())
+        try:
+            ak["miss_frames"] = max(0, int(self.ak_miss.get()))
+        except (tk.TclError, ValueError):
+            pass
         self.save_settings()
 
     def _hotkey_changed(self, spec):
@@ -902,7 +913,7 @@ class App:
             else:
                 self.result = res
                 self.autokey_status = self.autokey.update(
-                    self.library.snapshot()[0], set(res.present), now)
+                    self.library.snapshot()[0], res.present_fast, now)
                 flash = getattr(self, "_flash", None)
                 if flash and now < flash[1]:
                     self.status.configure(text=flash[0], foreground="#0a7a20")

@@ -44,6 +44,9 @@ DEFAULTS = {
         "enabled": True,  # master switch, also flipped by the toggle hotkey
         "toggle_hotkey": "f8",
         "only_when_focused": True,  # never send keys unless the game window has focus
+        # Frames a buff may be unseen before auto-press counts it as expired. Kept below
+        # the overlay's miss_frames so the first press lands right after expiry.
+        "miss_frames": 1,
     },
     # Buffs list groups (list only, the overlay ignores them): names in display order, and
     # the collapsed ones ("" = the Ungrouped section). A buff's group is stored on its entry.

@@ -18,6 +18,7 @@ class Result:
         self.recognised = []  # Unknowns the catalog named by itself
         self.learned = []  # (entry_id, crop) for catalog buffs first seen on screen
         self.present = {}  # entry_id -> Detection (latest box) for buffs currently up
+        self.present_fast = set()  # same, with auto-press's shorter miss_frames
         self.scores = {}  # entry_id -> best score this frame
         self.error = None
         self.fps = 0.0
@@ -89,9 +90,12 @@ class Worker(threading.Thread):
                     dets, new = self.detector.process(roi, cap_h)
                     res.recognised, self.detector.recognised = self.detector.recognised, []
                     res.learned, self.detector.learned = self.detector.learned, []
+                    ak_miss = self.settings["autokey"]["miss_frames"]
                     for e in entries:
                         if self.detector.is_present(e.id):
                             res.present[e.id] = self.detector.last_det[e.id]
+                        if self.detector.is_present(e.id, ak_miss):
+                            res.present_fast.add(e.id)
                 res.roi, res.capture_h = roi, cap_h
                 res.detections, res.new_unknowns = dets, new
                 for d in dets:
