@@ -20,7 +20,7 @@ class _Slot:
 
 class SkillOverlay(Overlay):
     SETTINGS_KEY = "skills_overlay"
-    HANDLE_TEXT = "Skills overlay - drag me"
+    PLACEHOLDER_TEXT = "Skills overlay (empty)"
 
     def __init__(self, app):
         super().__init__(app)
@@ -81,10 +81,7 @@ class SkillOverlay(Overlay):
             lines.append(st.label() if st else "unknown")
             if auto:
                 lines.append(auto)
-            label = "\n".join(lines)
-            if c.text.cget("text") != label:
-                c.text.configure(text=label)
-            c.show_text()
+            self.set_label(c, "\n".join(lines))
             alert = auto.startswith("gave up")
             c.text.configure(fg=ov["alert_color"] if alert else (
                 ov["off_text_color"] if ready else ov["text_color"]))
@@ -96,16 +93,7 @@ class SkillOverlay(Overlay):
 
         self._show_energy(result, now)
         any_auto = any(slot_settings(self.app.settings, i)["auto"] for i in range(4))
-        if any_auto and not autokey_on:
-            if not self.ak_label.winfo_ismapped():
-                self.ak_label.pack(side="bottom", fill="x")
-        elif self.ak_label.winfo_ismapped():
-            self.ak_label.pack_forget()
-        want_handle = not ov["click_through"] or not visible
-        if want_handle and not self.handle.winfo_ismapped():
-            self.handle.pack(side="top", fill="x", before=self.body)
-        elif not want_handle and self.handle.winfo_ismapped():
-            self.handle.pack_forget()
+        self.show_extras(any_auto and not autokey_on, not visible)
         self.place()
 
     def _show_energy(self, result, now):

@@ -75,17 +75,17 @@ DEFAULTS = {
         # x, y is the screen position of the anchor corner, which stays put while the
         # overlay grows or shrinks as buffs come and go.
         "anchor": "top-left",  # top-left, top-right, bottom-left, bottom-right
-        "zoom": 3.0,
+        "zoom": 2.5,
         "orientation": "vertical",  # "horizontal", or "grid" (wraps after `columns`)
         "columns": 3,
-        "cell_gap": 4,  # pixels between cells
-        "cell_padding": 2,  # pixels between a cell's border and its content
+        "cell_gap": 3,  # pixels between cells
+        "cell_padding": 1,  # pixels between a cell's border and its content
         "border_width": 2,  # alert / flash border, 0 hides it
         "show_missing": True,
         "show_names": True,
         "name_position": "below",  # or "right"
         "font_family": "Segoe UI",
-        "font_size": 10,
+        "font_size": 9,
         "font_bold": True,
         "text_color": "#e8e8e8",
         "off_text_color": "#8a8a8a",

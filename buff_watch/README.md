@@ -107,7 +107,8 @@ and the overlay's energy line blinks in the alert colour. If the bar isn't found
 your maximum energy, the same as the bar.
 
 **Skills overlay.** A second overlay shows the four slots magnified with the time left
-under each. Drag it by its blue bar; the *Skills overlay* tab has the same size, layout,
+under each. Drag it by any slot, and right-click it for the same quick menu as the buffs
+overlay; the *Skills overlay* tab has the same size, layout,
 font, colour and position options as the buffs overlay, kept separately, plus *Show
 energy*. Untick *In overlay* on the Skills tab to leave a slot out.
 
@@ -160,9 +161,12 @@ other windows on top of exclusive fullscreen, and capturing it may give a black 
    - Click **Teach icon...** at the top, drag a tight box around one icon (just the symbol,
      not the number), and name it. It's easiest with the buff active and the game paused
      or with you standing still.
-4. **Buffs overlay tab.** Drag the overlay by its blue bar to where you want it (or use the
+4. **Buffs overlay tab.** Drag the overlay by any buff to where you want it (or use the
    snap-to-corner buttons), then tick **Lock overlay** so mouse clicks go through it to the
-   game. The tab also sets the zoom, a vertical, horizontal or grid layout, spacing, font,
+   game. While it is unlocked, right-click the overlay for a quick menu (lock, hide, layout,
+   zoom, open settings) and turn the mouse wheel over it to zoom. An unlocked overlay with
+   nothing to show appears as a small "(empty)" label so you can still find it. A small
+   *AUTO OFF* tag in its corner means auto-press is switched off. The tab also sets the zoom, a vertical, horizontal or grid layout, spacing, font,
    name position, colours, opacity and how dim off buffs look. Every change shows at once.
    **Corner that stays put** decides which corner of the overlay keeps its place while buffs
    come and go: pick bottom-right for an overlay in the bottom-right of the screen.
